@@ -1,5 +1,5 @@
-import type {Pokemon} from "../models/pokemon";
-import {toPokemonItems} from "./pokemonMapper";
+import type { Pokemon } from "../models/pokemon";
+import { toPokemonItems } from "./pokemonMapper";
 
 describe("toPokemonItems", () => {
     it("should map a Pokemon into metadata and stats items", () => {
@@ -10,13 +10,14 @@ describe("toPokemonItems", () => {
             id: id,
             name: "Pikachu",
             types: ["Electric"],
-            description: "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
+            description:
+                "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
             region: "Kanto",
             maxLevel: 100,
             maxHp: 380,
             maxAttack: 250,
             maxDefense: 180,
-            createdAt: now
+            createdAt: now,
         };
 
         const result = toPokemonItems(pokemon);
@@ -32,7 +33,9 @@ describe("toPokemonItems", () => {
         expect(metadataItem.entityType).toBe("POKEMON_METADATA");
         expect(metadataItem.name).toBe("Pikachu");
         expect(metadataItem.types).toEqual(["Electric"]);
-        expect(metadataItem.description).toBe("Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques");
+        expect(metadataItem.description).toBe(
+            "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques"
+        );
         expect(metadataItem.region).toBe("Kanto");
         expect(metadataItem.createdAt).toEqual(now);
 

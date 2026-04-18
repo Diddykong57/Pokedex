@@ -1,6 +1,6 @@
 import { Pokemon } from "../models/pokemon";
-import type {PokemonMetadataItem, PokemonStatsItem} from "../repositories/types/pokemonItem";
-import type {PokemonResponseDto} from "../dto/pokemon/pokemonResponse.dto";
+import type { PokemonMetadataItem, PokemonStatsItem } from "../repositories/types/pokemonItem";
+import type { PokemonResponseDto } from "../dto/pokemon/pokemonResponse.dto";
 
 export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonStatsItem] => {
     const pk = `POKEMON#${pokemon.id}`;

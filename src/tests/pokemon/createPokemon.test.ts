@@ -1,5 +1,5 @@
-import {handler} from "../../handlers/pokemon/createPokemon";
-import {getFakeDb} from "../../repositories/impl/local/localPokemonRepository";
+import { handler } from "../../handlers/pokemon/createPokemon";
+import { getFakeDb } from "../../repositories/impl/local/localPokemonRepository";
 
 describe("createPokemon", () => {
     it("should create a pokemon and store it", async () => {
@@ -7,7 +7,8 @@ describe("createPokemon", () => {
             body: JSON.stringify({
                 name: "Pikachu",
                 types: ["Electric"],
-                description: "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
+                description:
+                    "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
                 region: "Kanto",
                 maxLevel: 100,
                 maxHp: 380,

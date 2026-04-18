@@ -1,7 +1,7 @@
-import type {Pokemon} from "../../../models/pokemon";
-import {toPokemonItems} from "../../../mappers/pokemonMapper";
-import type {PokemonRepository} from "../../pokemonRepository";
-import type {PokemonItem} from "../../types/pokemonItem";
+import type { Pokemon } from "../../../models/pokemon";
+import { toPokemonItems } from "../../../mappers/pokemonMapper";
+import type { PokemonRepository } from "../../pokemonRepository";
+import type { PokemonItem } from "../../types/pokemonItem";
 
 const fakeDb: PokemonItem[] = [];
 

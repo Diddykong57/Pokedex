@@ -22,6 +22,4 @@ export interface PokemonStatsItem {
     createdAt: string;
 }
 
-export type PokemonItem =
-    | PokemonMetadataItem
-    | PokemonStatsItem;
+export type PokemonItem = PokemonMetadataItem | PokemonStatsItem;

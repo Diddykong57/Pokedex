@@ -1,6 +1,5 @@
-import type {CreatePokemonRequestDto} from "../../dto/pokemon/createPokemonRequest.dto";
-import type {Pokemon} from "../../models/pokemon";
-import {PokemonServiceImpl} from "./pokemonServiceImpl";
+import type { CreatePokemonRequestDto } from "../../dto/pokemon/createPokemonRequest.dto";
+import { PokemonServiceImpl } from "./pokemonServiceImpl";
 
 describe("pokemonService", () => {
     it("should build pokemon then call pokemonRepository.create", async () => {
@@ -13,12 +12,13 @@ describe("pokemonService", () => {
         const data: CreatePokemonRequestDto = {
             name: "Pikachu",
             types: ["Electric"],
-            description: "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
+            description:
+                "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
             region: "Kanto",
             maxLevel: 100,
             maxHp: 380,
             maxAttack: 250,
-            maxDefense: 180
+            maxDefense: 180,
         };
 
         await service.createPokemon(data);
@@ -30,5 +30,5 @@ describe("pokemonService", () => {
         expect(pokemonSent.id).toEqual(expect.any(String));
         expect(pokemonSent.createdAt).toEqual(expect.any(String));
         expect(pokemonSent.name).toBe("Pikachu");
-    })
-})
+    });
+});
