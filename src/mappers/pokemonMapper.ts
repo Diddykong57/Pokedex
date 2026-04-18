@@ -1,17 +1,18 @@
 import { Pokemon } from "../models/pokemon";
 import type { PokemonMetadataItem, PokemonStatsItem } from "../repositories/types/pokemonItem";
 import type { PokemonResponseDto } from "../dto/pokemon/pokemonResponse.dto";
+import {POKEMON_ITEM} from "../global/constants/pokemon";
 
 export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonStatsItem] => {
-    const pk = `POKEMON#${pokemon.id}`;
+    const pk = `${POKEMON_ITEM.PK_PREFIX}#${pokemon.id}`;
 
     return [
         {
             PK: pk,
-            SK: "METADATA",
-            GSI1PK: "POKEMON",
+            SK: POKEMON_ITEM.METADATA.SK,
+            GSI1PK: POKEMON_ITEM.METADATA.GSI1PK,
             GSI1SK: pokemon.name,
-            entityType: "POKEMON_METADATA",
+            entityType: POKEMON_ITEM.METADATA.ENTITY_TYPE,
             name: pokemon.name,
             types: pokemon.types,
             description: pokemon.description,
@@ -20,8 +21,8 @@ export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonS
         },
         {
             PK: pk,
-            SK: "STATS",
-            entityType: "POKEMON_STATS",
+            SK: POKEMON_ITEM.STATS.SK,
+            entityType: POKEMON_ITEM.STATS.ENTITY_TYPE,
             maxLevel: pokemon.maxLevel,
             maxHp: pokemon.maxHp,
             maxAttack: pokemon.maxAttack,
