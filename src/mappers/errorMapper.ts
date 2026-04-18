@@ -5,6 +5,19 @@ import { ERROR_MESSAGES } from "../global/constants/errorMessages";
 
 export function toApiErrorResponse(error: unknown): ApiResponse {
     if (isHttpError(error)) {
+        // Get error.details.details if present, otherwise undefined
+        const details = (error.details as { details?: string[] } | undefined)?.details;
+
+        if (details) {
+            return {
+                statusCode: error.statusCode,
+                body: JSON.stringify({
+                    message: error.message,
+                    details: details,
+                }),
+            };
+        }
+
         return {
             statusCode: error.statusCode,
             body: JSON.stringify({
