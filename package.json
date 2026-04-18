@@ -21,11 +21,13 @@
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.1031.0",
         "@aws-sdk/lib-dynamodb": "^3.1031.0",
+        "http-errors": "^2.0.1",
         "joi": "^18.1.2",
         "uuid": "^13.0.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.4",
+        "@types/http-errors": "^2.0.5",
         "@types/jest": "^30.0.0",
         "@types/node": "^25.6.0",
         "eslint": "^9.39.4",

@@ -5,6 +5,9 @@ import type { PokemonService } from "../../services/pokemonService";
 import type { PokemonRepository } from "../../repositories/pokemonRepository";
 import { toPokemonResponseDto } from "../../mappers/pokemonMapper";
 import type {ApiRequest, ApiResponse} from "../../global/types/api";
+import {badRequestError} from "../../utils/errorUtils";
+import {ERROR_MESSAGES} from "../../global/constants/errorMessages";
+import {toApiErrorResponse} from "../../mappers/errorMapper";
 
 const repository: PokemonRepository = new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
@@ -12,14 +15,10 @@ const service: PokemonService = new PokemonServiceImpl(repository);
 export const handler = async (event: ApiRequest): Promise<ApiResponse> => {
     try {
         if (!event.body) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Missing body" }),
-            };
+            throw badRequestError(ERROR_MESSAGES.MISSING_BODY);
         }
 
         const data = JSON.parse(event.body) as CreatePokemonRequestDto;
-
         const pokemon = await service.createPokemon(data);
         const response = toPokemonResponseDto(pokemon);
 
@@ -27,10 +26,9 @@ export const handler = async (event: ApiRequest): Promise<ApiResponse> => {
             statusCode: 201,
             body: JSON.stringify(response),
         };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ message: "Internal server error" }),
-        };
+    } catch (error: unknown) {
+        return toApiErrorResponse(error);
     }
 };
+
+
