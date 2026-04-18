@@ -1,7 +1,7 @@
 import { Pokemon } from "../models/pokemon";
 import type { PokemonMetadataItem, PokemonStatsItem } from "../repositories/types/pokemonItem";
 import type { PokemonResponseDto } from "../dto/pokemon/pokemonResponse.dto";
-import {POKEMON_ITEM} from "../global/constants/pokemon";
+import { POKEMON_ITEM } from "../global/constants/pokemon";
 
 export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonStatsItem] => {
     const pk = `${POKEMON_ITEM.PK_PREFIX}#${pokemon.id}`;

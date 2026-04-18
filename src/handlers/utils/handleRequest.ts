@@ -1,6 +1,6 @@
-import {HTTP} from "../../global/constants/httpStatus";
-import type {ApiResponse} from "../../global/types/api";
-import {toApiErrorResponse} from "../../mappers/errorMapper";
+import { HTTP } from "../../global/constants/httpStatus";
+import type { ApiResponse } from "../../global/types/api";
+import { toApiErrorResponse } from "../../mappers/errorMapper";
 
 export async function handleRequest<Result>(
     action: () => Promise<Result>,

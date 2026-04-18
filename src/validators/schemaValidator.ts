@@ -9,7 +9,6 @@ export function validateSchema<T>(schema: Joi.ObjectSchema<T>, payload: unknown)
 
     if (error) {
         const details = error.details.map(err => err.message.replace(/"/g, ""));
-        console.log(details)
         throw badRequestError("Validation error", { details });
     }
 

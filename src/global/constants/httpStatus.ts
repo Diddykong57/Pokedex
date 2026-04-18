@@ -1,4 +1,4 @@
-export const HTTP= {
+export const HTTP = {
     // Success
     OK: 200,
     CREATED: 201,
@@ -13,5 +13,5 @@ export const HTTP= {
 
     // Server error
     INTERNAL_SERVER_ERROR: 500,
-    SERVICE_UNAVAILABLE: 503
-}
+    SERVICE_UNAVAILABLE: 503,
+};
