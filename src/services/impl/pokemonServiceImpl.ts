@@ -3,15 +3,18 @@ import type { PokemonRepository } from "../../repositories/pokemonRepository";
 import type { CreatePokemonRequestDto } from "../../dto/pokemon/createPokemonRequest.dto";
 import type { Pokemon } from "../../models/pokemon";
 import type { PokemonService } from "../pokemonService";
+import {generateId} from "../../utils/id";
+import {getCurrentDate} from "../../utils/date";
 
 export class PokemonServiceImpl implements PokemonService {
     constructor(private readonly pokemonRepository: PokemonRepository) {}
 
     async createPokemon(data: CreatePokemonRequestDto): Promise<Pokemon> {
-        const now = new Date().toISOString();
+        const id = generateId();
+        const now = getCurrentDate();
 
         const pokemon: Pokemon = {
-            id: randomUUID(),
+            id: id,
             name: data.name,
             types: data.types,
             description: data.description,
