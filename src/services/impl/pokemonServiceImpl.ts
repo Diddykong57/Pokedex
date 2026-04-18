@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import type { PokemonRepository } from "../../repositories/pokemonRepository";
 import type { CreatePokemonRequestDto } from "../../dto/pokemon/createPokemonRequest.dto";
 import type { Pokemon } from "../../models/pokemon";
