@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"description": "Pokedex API - AWS Serverless",
 	"scripts": {
+		"dev": "tsx src/local.ts",
 		"build": "tsc",
 		"test": "jest",
 		"lint": "eslint .",
