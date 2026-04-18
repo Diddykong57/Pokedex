@@ -7,28 +7,22 @@ import { toPokemonResponseDto } from "../../mappers/pokemonMapper";
 import type {ApiRequest, ApiResponse} from "../../global/types/api";
 import {badRequestError} from "../../utils/errorUtils";
 import {ERROR_MESSAGES} from "../../global/constants/errorMessages";
-import {toApiErrorResponse} from "../../mappers/errorMapper";
+import {handleRequest} from "../utils/handleRequest";
+import {HTTP} from "../../global/constants/httpStatus";
+import type {PokemonResponseDto} from "../../dto/pokemon/pokemonResponse.dto";
 
 const repository: PokemonRepository = new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
 
 export const handler = async (event: ApiRequest): Promise<ApiResponse> => {
-    try {
+    return handleRequest(async (): Promise<PokemonResponseDto> => {
         if (!event.body) {
             throw badRequestError(ERROR_MESSAGES.MISSING_BODY);
         }
 
         const data = JSON.parse(event.body) as CreatePokemonRequestDto;
         const pokemon = await service.createPokemon(data);
-        const response = toPokemonResponseDto(pokemon);
 
-        return {
-            statusCode: 201,
-            body: JSON.stringify(response),
-        };
-    } catch (error: unknown) {
-        return toApiErrorResponse(error);
-    }
+        return toPokemonResponseDto(pokemon);
+    }, HTTP.CREATED);
 };
-
-
