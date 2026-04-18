@@ -2,8 +2,8 @@ import type { PokemonRepository } from "../../repositories/pokemonRepository";
 import type { CreatePokemonRequestDto } from "../../dto/pokemon/createPokemonRequest.dto";
 import type { Pokemon } from "../../models/pokemon";
 import type { PokemonService } from "../pokemonService";
-import {generateId} from "../../utils/id";
-import {getCurrentDate} from "../../utils/date";
+import {generateId} from "../../utils/idUtils";
+import {getCurrentDate} from "../../utils/dateUtils";
 
 export class PokemonServiceImpl implements PokemonService {
     constructor(private readonly pokemonRepository: PokemonRepository) {}
