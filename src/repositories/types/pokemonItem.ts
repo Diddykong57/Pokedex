@@ -1,5 +1,6 @@
-export interface PokemonMetadataItem {
-    PK: string;
+import type {BaseItem} from "./baseItem";
+
+export interface PokemonMetadataItem extends BaseItem{
     SK: "METADATA";
     GSI1PK: "POKEMON";
     GSI1SK: string;
@@ -11,8 +12,7 @@ export interface PokemonMetadataItem {
     createdAt: string;
 }
 
-export interface PokemonStatsItem {
-    PK: string;
+export interface PokemonStatsItem extends BaseItem{
     SK: "STATS";
     entityType: "POKEMON_STATS";
     maxLevel: number;
