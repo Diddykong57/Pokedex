@@ -15,4 +15,6 @@ export class LocalPokemonRepository implements PokemonRepository {
     }
 }
 
-export const getFakeDb = () => fakeDb;
+export function getFakeDb() {
+    return fakeDb;
+}
