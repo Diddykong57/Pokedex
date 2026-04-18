@@ -4,11 +4,12 @@ import { PokemonServiceImpl } from "../../services/impl/pokemonServiceImpl";
 import type { PokemonService } from "../../services/pokemonService";
 import type { PokemonRepository } from "../../repositories/pokemonRepository";
 import { toPokemonResponseDto } from "../../mappers/pokemonMapper";
+import type {ApiRequest, ApiResponse} from "../../global/types/api";
 
 const repository: PokemonRepository = new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
 
-export const handler = async (event: { body: string | null }): Promise<{ statusCode: number; body: string }> => {
+export const handler = async (event: ApiRequest): Promise<ApiResponse> => {
     try {
         if (!event.body) {
             return {
