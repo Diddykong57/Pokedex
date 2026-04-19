@@ -1,9 +1,8 @@
 import type {Pokemon, PokemonListItem} from "../../../models/pokemon";
 import {toPokemonDetails, toPokemonFromMetadataItem, toPokemonItems} from "../../../mappers/pokemonMapper";
 import type { PokemonRepository } from "../../pokemonRepository";
-import { ListTablesCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
-    UpdateCommand,
     PutCommand,
     DynamoDBDocumentClient,
     DeleteCommand, GetCommand, ScanCommand,
@@ -17,52 +16,34 @@ const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
 
 export class DynamoPokemonRepository implements PokemonRepository {
+    private readonly tableName = process.env.TABLE_NAME!;
+
     async create(pokemon: Pokemon): Promise<void> {
-        const [metadataItem, statsItem] = toPokemonItems(pokemon);
-
-        await docClient.send(
-            new PutCommand({
-                TableName: process.env.TABLE_NAME,
-                Item: metadataItem,
-            })
-        );
-
-        await docClient.send(
-            new PutCommand({
-                TableName: process.env.TABLE_NAME,
-                Item: statsItem,
-            })
-        );
+        await this.savePokemon(pokemon);
     }
 
     async deletePokemon(id: string): Promise<void> {
         const pk = this.buildPk(id);
 
-        const metadataResponse = await docClient.send(
+        await docClient.send(
             new DeleteCommand({
-                TableName: process.env.TABLE_NAME,
+                TableName: this.tableName,
                 Key: {
                     PK: pk,
                     SK: POKEMON_ITEM.METADATA.SK,
-                },
-                ReturnValues: "ALL_OLD",
+                }
             })
         );
 
-        const statsResponse = await docClient.send(
+        await docClient.send(
             new DeleteCommand({
-                TableName: process.env.TABLE_NAME,
+                TableName: this.tableName,
                 Key: {
                     PK: pk,
                     SK: POKEMON_ITEM.STATS.SK,
-                },
-                ReturnValues: "ALL_OLD",
+                }
             })
         );
-
-        if (!metadataResponse.Attributes && !statsResponse.Attributes) {
-            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
-        }
     }
 
     async getPokemonDetails(id: string): Promise<Pokemon> {
@@ -71,17 +52,13 @@ export class DynamoPokemonRepository implements PokemonRepository {
         const metadata = await this.getMetadata(pk);
         const stats = await this.getStats(pk);
 
-        if (!metadata || !stats) {
-            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
-        }
-
         return toPokemonDetails(metadata, stats);
     }
 
     async getPokemonList(): Promise<PokemonListItem[]> {
         const response = await docClient.send(
             new ScanCommand({
-                TableName: process.env.TABLE_NAME,
+                TableName: this.tableName,
                 FilterExpression: "SK = :sk AND GSI1PK = :gsi1pk",
                 ExpressionAttributeValues: {
                     ":sk": POKEMON_ITEM.METADATA.SK,
@@ -96,27 +73,13 @@ export class DynamoPokemonRepository implements PokemonRepository {
     }
 
     async updatePokemon(pokemon: Pokemon): Promise<void> {
-        const [metadataItem, statsItem] = toPokemonItems(pokemon);
-
-        await docClient.send(
-            new PutCommand({
-                TableName: process.env.TABLE_NAME,
-                Item: metadataItem,
-            })
-        );
-
-        await docClient.send(
-            new PutCommand({
-                TableName: process.env.TABLE_NAME,
-                Item: statsItem,
-            })
-        );
+        await this.savePokemon(pokemon);
     }
 
     private async getMetadata(pk: string): Promise<PokemonMetadataItem> {
         const response = await docClient.send(
             new GetCommand({
-                TableName: process.env.TABLE_NAME,
+                TableName: this.tableName,
                 Key: {
                     PK: pk,
                     SK: POKEMON_ITEM.METADATA.SK,
@@ -134,7 +97,7 @@ export class DynamoPokemonRepository implements PokemonRepository {
     private async getStats(pk: string): Promise<PokemonStatsItem> {
         const response = await docClient.send(
             new GetCommand({
-                TableName: process.env.TABLE_NAME,
+                TableName: this.tableName,
                 Key: {
                     PK: pk,
                     SK: POKEMON_ITEM.STATS.SK,
@@ -149,7 +112,25 @@ export class DynamoPokemonRepository implements PokemonRepository {
         return response.Item as PokemonStatsItem;
     }
 
-    private buildPk(id): string {
+    private buildPk(id: string): string {
         return `${POKEMON_ITEM.PK_PREFIX}#${id}`;
+    }
+
+    private async savePokemon(pokemon: Pokemon): Promise<void> {
+        const [metadataItem, statsItem] = toPokemonItems(pokemon);
+
+        await docClient.send(
+            new PutCommand({
+                TableName: this.tableName,
+                Item: metadataItem,
+            })
+        );
+
+        await docClient.send(
+            new PutCommand({
+                TableName: this.tableName,
+                Item: statsItem,
+            })
+        );
     }
 }
