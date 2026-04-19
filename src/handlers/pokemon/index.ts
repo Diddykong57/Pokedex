@@ -19,6 +19,9 @@ export const handler = async (event) => {
         case "POST":
             return createPokemonHandler(service, event);
         case "GET":
+            if (event.pathParameters?.id) {
+                return getPokemonDetailsHandler(service, event);
+            }
             return getPokemonListHandler(service);
 
         default:
