@@ -37,6 +37,9 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: pokedex-dynamo
+      Policies:
+        DynamoDBCrudPolicy:
+            TableName: pokedex-dynamo
       Events:
         PokemonGetList:
           Type: Api
