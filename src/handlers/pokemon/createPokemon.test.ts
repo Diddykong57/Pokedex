@@ -33,25 +33,23 @@ describe("handler - create pokemon", () => {
         expect(parseBody.name).toEqual(undefined);
     });
 
-    // To add with Joi feature
-    // it("should return 400 when body corrupted", async () => {
-    //     const payload = {
-    //         body: JSON.stringify({
-    //             name: "Pikachu",
-    //             types: ["Electric"],
-    //             description: "Petit et jaune auux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
-    //             region: "Kanto",
-    //             maxLevel: 100,
-    //             maxHp: 380,
-    //             maxAttack: 250,
-    //             maxDefense: 180,
-    //             nickname: "PikaPika"
-    //         }),
-    //     }
-    //     const response = await handler(payload);
-    //     const parseBody = JSON.parse(response.body)
-    //
-    //     expect(response.statusCode).toBe(400);
-    //     expect(parseBody.name).toEqual(undefined);
-    // });
+    it("should return 400 when body corrupted", async () => {
+        const payload = {
+            body: JSON.stringify({
+                types: ["Electric"],
+                description: "Petit et jaune auux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
+                region: "Kanto",
+                maxLevel: 100,
+                maxHp: 380,
+                maxAttack: 250,
+                maxDefense: 180,
+                nickname: "PikaPika"
+            }),
+        }
+        const response = await handler(payload);
+        const parseBody = JSON.parse(response.body)
+
+        expect(response.statusCode).toBe(400);
+        expect(parseBody.name).toEqual(undefined);
+    });
 });
