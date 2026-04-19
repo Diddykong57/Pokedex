@@ -1,4 +1,4 @@
-import { handler } from "./createPokemon";
+import { createPokemonHandler } from "./createPokemon";
 
 describe("handler - create pokemon", () => {
     it("should create a pokemon and return code 201", async () => {
@@ -15,7 +15,7 @@ describe("handler - create pokemon", () => {
                 maxDefense: 180,
             }),
         };
-        const response = await handler(payload);
+        const response = await createPokemonHandler(payload);
         const parseBody = JSON.parse(response.body);
 
         expect(response.statusCode).toBe(201);
@@ -26,7 +26,7 @@ describe("handler - create pokemon", () => {
         const payload = {
             body: null,
         };
-        const response = await handler(payload);
+        const response = await createPokemonHandler(payload);
         const parseBody = JSON.parse(response.body);
 
         expect(response.statusCode).toBe(400);
@@ -47,7 +47,7 @@ describe("handler - create pokemon", () => {
                 nickname: "PikaPika",
             }),
         };
-        const response = await handler(payload);
+        const response = await createPokemonHandler(payload);
         const parseBody = JSON.parse(response.body);
 
         expect(response.statusCode).toBe(400);

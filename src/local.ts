@@ -1,8 +1,8 @@
 import { getFakeDb } from "./repositories/impl/local/localPokemonRepository";
-import { handler as createPokemonHandler } from "./handlers/pokemon/createPokemon";
-import { handler as getPokemonListHandler} from "./handlers/pokemon/getPokemonList";
-import { handler as getPokemonDetailsHandler} from "./handlers/pokemon/getPokemonDetails";
-import { handler as updatePokemonHandler} from "./handlers/pokemon/updatePokemon";
+import { createPokemonHandler } from "./handlers/pokemon/createPokemon";
+import { getPokemonListHandler} from "./handlers/pokemon/getPokemonList";
+import { getPokemonDetailsHandler} from "./handlers/pokemon/getPokemonDetails";
+import { updatePokemonHandler} from "./handlers/pokemon/updatePokemon";
 import {pokemonCreateFixture, pokemonUpdateFixture} from "./tests/fixtures/pokemon";
 import type {ApiResponse} from "./global/types/api";
 

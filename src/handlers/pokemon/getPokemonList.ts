@@ -9,7 +9,7 @@ import { toPokemonListResponseDto } from "../../mappers/pokemonMapper";
 const repository: PokemonRepository = new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
 
-export const handler = async (): Promise<ApiResponse> => {
+export const getPokemonListHandler = async (): Promise<ApiResponse> => {
     return handleRequest(async () => {
         const pokemonList = await service.getPokemonList();
         return pokemonList.map(toPokemonListResponseDto);

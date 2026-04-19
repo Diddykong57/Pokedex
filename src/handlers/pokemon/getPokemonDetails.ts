@@ -9,7 +9,7 @@ import { toPokemonResponseDto } from "../../mappers/pokemonMapper";
 const repository: PokemonRepository = new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
 
-export const handler = async (id: string): Promise<ApiResponse> => {
+export const getPokemonDetailsHandler = async (id: string): Promise<ApiResponse> => {
     return handleRequest(async () => {
         const pokemon = await service.getPokemonDetails(id);
         return toPokemonResponseDto(pokemon);

@@ -14,7 +14,7 @@ import { validateSchema } from "../../validators/schemaValidator";
 const repository: PokemonRepository = new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
 
-export const handler = async (event: ApiRequest): Promise<ApiResponse> => {
+export const createPokemonHandler = async (event: ApiRequest): Promise<ApiResponse> => {
     return handleRequest(async () => {
         if (!event.body) {
             throw badRequestError(ERROR_MESSAGES.MISSING_BODY);

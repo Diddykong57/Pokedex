@@ -1,5 +1,5 @@
-import { handler as getPokemonListHandler } from "../../handlers/pokemon/getPokemonList";
-import { handler as createPokemonHandler } from "../../handlers/pokemon/createPokemon";
+import { getPokemonListHandler as getPokemonListHandler } from "../../handlers/pokemon/getPokemonList";
+import { createPokemonHandler as createPokemonHandler } from "../../handlers/pokemon/createPokemon";
 import { pokemonCreateFixture } from "../fixtures/pokemon";
 
 describe("getPokemonList", () => {

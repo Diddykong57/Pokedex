@@ -1,9 +1,9 @@
-import { handler } from "../../handlers/pokemon/createPokemon";
+import { createPokemonHandler } from "../../handlers/pokemon/createPokemon";
 import { getFakeDb } from "../../repositories/impl/local/localPokemonRepository";
 
 describe("createPokemon", () => {
     it("should create a pokemon and store it", async () => {
-        const response = await handler({
+        const response = await createPokemonHandler({
             body: JSON.stringify({
                 name: "Pikachu",
                 types: ["Electric"],
