@@ -8,6 +8,7 @@ import {LocalPokemonRepository} from "../../repositories/impl/local/localPokemon
 import type {PokemonService} from "../../services/pokemonService";
 import {PokemonServiceImpl} from "../../services/impl/pokemonServiceImpl";
 import {updatePokemonHandler} from "./updatePokemon";
+import {deletePokemonHandler} from "./deletePokemon";
 
 const repository: PokemonRepository =
     process.env.APP_ENV === "aws"
@@ -26,6 +27,8 @@ export const handler = async (event) => {
             return getPokemonListHandler(service);
         case "PUT":
             return updatePokemonHandler(service, event);
+        case "DELETE":
+            return deletePokemonHandler(service, event);
 
         default:
             return {

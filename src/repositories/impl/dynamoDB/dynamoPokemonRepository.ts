@@ -36,7 +36,33 @@ export class DynamoPokemonRepository implements PokemonRepository {
     }
 
     async deletePokemon(id: string): Promise<void> {
+        const pk = `${POKEMON_ITEM.PK_PREFIX}#${id}`;
 
+        const metadataResponse = await docClient.send(
+            new DeleteCommand({
+                TableName: process.env.TABLE_NAME,
+                Key: {
+                    PK: pk,
+                    SK: POKEMON_ITEM.METADATA.SK,
+                },
+                ReturnValues: "ALL_OLD",
+            })
+        );
+
+        const statsResponse = await docClient.send(
+            new DeleteCommand({
+                TableName: process.env.TABLE_NAME,
+                Key: {
+                    PK: pk,
+                    SK: POKEMON_ITEM.STATS.SK,
+                },
+                ReturnValues: "ALL_OLD",
+            })
+        );
+
+        if (!metadataResponse.Attributes && !statsResponse.Attributes) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
     }
 
     async getPokemonDetails(id: string): Promise<Pokemon> {
