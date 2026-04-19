@@ -9,7 +9,6 @@ export const ERROR_MESSAGES = {
     MISSING_BODY: "Body is missing",
     ITEM_NOT_FOUND: "Item not found",
 
-
     // Server error
     INTERNAL_SERVER_ERROR: "Pokedex API - Internal Server Error",
     ENTITY_ALREADY_EXISTS: "Entity already exists",

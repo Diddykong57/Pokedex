@@ -1,6 +1,6 @@
 import type { Pokemon } from "../models/pokemon";
 import { toPokemonItems } from "./pokemonMapper";
-import {LocalPokemonRepository} from "../repositories/impl/local/localPokemonRepository";
+import { LocalPokemonRepository } from "../repositories/impl/local/localPokemonRepository";
 
 describe("toPokemonItems", () => {
     it("should map a Pokemon into metadata and stats items", () => {
@@ -58,5 +58,5 @@ describe("getPokemonList", () => {
 
         expect(result.every(metadata => metadata.GSI1PK === "POKEMON")).toEqual(true);
         expect(result.every(pokemon => pokemon.name)).toBe(true);
-    })
-})
+    });
+});

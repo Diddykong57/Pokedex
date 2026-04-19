@@ -37,17 +37,18 @@ describe("handler - create pokemon", () => {
         const payload = {
             body: JSON.stringify({
                 types: ["Electric"],
-                description: "Petit et jaune auux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
+                description:
+                    "Petit et jaune auux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
                 region: "Kanto",
                 maxLevel: 100,
                 maxHp: 380,
                 maxAttack: 250,
                 maxDefense: 180,
-                nickname: "PikaPika"
+                nickname: "PikaPika",
             }),
-        }
+        };
         const response = await handler(payload);
-        const parseBody = JSON.parse(response.body)
+        const parseBody = JSON.parse(response.body);
 
         expect(response.statusCode).toBe(400);
         expect(parseBody.name).toEqual(undefined);

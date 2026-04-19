@@ -1,6 +1,6 @@
-import {Pokemon, PokemonListItem} from "../models/pokemon";
+import { Pokemon, PokemonListItem } from "../models/pokemon";
 import type { PokemonMetadataItem, PokemonStatsItem } from "../repositories/types/pokemonItem";
-import type {PokemonListResponseDto, PokemonResponseDto} from "../dto/pokemon/pokemonResponse.dto";
+import type { PokemonListResponseDto, PokemonResponseDto } from "../dto/pokemon/pokemonResponse.dto";
 import { POKEMON_ITEM } from "../global/constants/pokemon";
 
 export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonStatsItem] => {
@@ -38,7 +38,7 @@ export const toPokemonFromMetadataItem = (item: PokemonMetadataItem): PokemonLis
     types: item.types,
     description: item.description,
     region: item.region,
-    createdAt: item.createdAt
+    createdAt: item.createdAt,
 });
 
 export const toPokemonResponseDto = (pokemon: Pokemon): PokemonResponseDto => ({
@@ -60,4 +60,4 @@ export const toPokemonListResponseDto = (pokemon: PokemonListItem): PokemonListR
     types: pokemon.types,
     description: pokemon.description,
     region: pokemon.region,
-})
+});
