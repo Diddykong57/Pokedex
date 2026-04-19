@@ -70,7 +70,21 @@ export class DynamoPokemonRepository implements PokemonRepository {
     }
 
     async updatePokemon(pokemon: Pokemon): Promise<void> {
+        const [metadataItem, statsItem] = toPokemonItems(pokemon);
 
+        await docClient.send(
+            new PutCommand({
+                TableName: process.env.TABLE_NAME,
+                Item: metadataItem,
+            })
+        );
+
+        await docClient.send(
+            new PutCommand({
+                TableName: process.env.TABLE_NAME,
+                Item: statsItem,
+            })
+        );
     }
 
     private async getMetadata(pk: string): Promise<PokemonMetadataItem> {

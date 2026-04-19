@@ -7,6 +7,7 @@ import {DynamoPokemonRepository} from "../../repositories/impl/dynamoDB/dynamoPo
 import {LocalPokemonRepository} from "../../repositories/impl/local/localPokemonRepository";
 import type {PokemonService} from "../../services/pokemonService";
 import {PokemonServiceImpl} from "../../services/impl/pokemonServiceImpl";
+import {updatePokemonHandler} from "./updatePokemon";
 
 const repository: PokemonRepository =
     process.env.APP_ENV === "aws"
@@ -23,6 +24,8 @@ export const handler = async (event) => {
                 return getPokemonDetailsHandler(service, event);
             }
             return getPokemonListHandler(service);
+        case "PUT":
+            return updatePokemonHandler(service, event);
 
         default:
             return {
