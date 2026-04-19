@@ -31,4 +31,8 @@ export class PokemonServiceImpl implements PokemonService {
     async getPokemonList(): Promise<PokemonListItem[]> {
         return this.pokemonRepository.getPokemonList();
     }
+
+    async getPokemonDetails(id: string): Promise<Pokemon> {
+        return this.pokemonRepository.getPokemonDetails(id);
+    }
 }

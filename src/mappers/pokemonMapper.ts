@@ -33,12 +33,25 @@ export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonS
 };
 
 export const toPokemonFromMetadataItem = (item: PokemonMetadataItem): PokemonListItem => ({
-    id: item.PK.replace("POKEMON#", ""),
+    id: item.PK.replace(`${POKEMON_ITEM.PK_PREFIX}#`, ""),
     name: item.name,
     types: item.types,
     description: item.description,
     region: item.region,
     createdAt: item.createdAt,
+});
+
+export const toPokemonDetails = (metadataItem: PokemonMetadataItem, statsItem: PokemonStatsItem): Pokemon => ({
+    id: metadataItem.PK.replace(`${POKEMON_ITEM.PK_PREFIX}#`, ""),
+    name: metadataItem.name,
+    types: metadataItem.types,
+    description: metadataItem.description,
+    region: metadataItem.region,
+    maxLevel: statsItem.maxLevel,
+    maxHp: statsItem.maxHp,
+    maxAttack: statsItem.maxAttack,
+    maxDefense: statsItem.maxDefense,
+    createdAt: metadataItem.createdAt,
 });
 
 export const toPokemonResponseDto = (pokemon: Pokemon): PokemonResponseDto => ({

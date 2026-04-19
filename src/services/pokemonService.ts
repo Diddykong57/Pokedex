@@ -4,4 +4,5 @@ import type { CreatePokemonRequestDto } from "../dto/pokemon/createPokemonReques
 export interface PokemonService {
     createPokemon(data: CreatePokemonRequestDto): Promise<Pokemon>;
     getPokemonList(): Promise<PokemonListItem[]>;
+    getPokemonDetails(id: string): Promise<Pokemon>;
 }
