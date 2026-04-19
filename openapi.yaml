@@ -1,0 +1,189 @@
+openapi: 3.0.3
+
+info:
+  title: Pokedex API
+  version: 1.0.0
+  description: REST API for managing a Pokémon catalog.
+
+servers:
+  - url: https://36ymd9qykj.execute-api.eu-north-1.amazonaws.com/Prod
+
+tags:
+  - name: HealthCheck
+    description: API availability check
+  - name: Pokemon
+    description: Pokémon management
+
+paths:
+  /healthCheck:
+    get:
+      tags:
+        - HealthCheck
+      summary: Check API health status
+      responses:
+        '200':
+          description: API is running
+
+  /pokemon:
+    get:
+      tags:
+        - Pokemon
+      summary: Get all Pokémon
+      responses:
+        '200':
+          description: Pokémon list retrieved successfully
+
+    post:
+      tags:
+        - Pokemon
+      summary: Create a new Pokémon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePokemonRequest'
+      responses:
+        '201':
+          description: Pokémon created successfully
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+
+  /pokemon/{id}:
+    get:
+      tags:
+        - Pokemon
+      summary: Get Pokémon details by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Pokémon unique identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pokémon found
+        '404':
+          description: Pokémon not found
+
+    put:
+      tags:
+        - Pokemon
+      summary: Update an existing Pokémon
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Pokémon unique identifier
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePokemonRequest'
+      responses:
+        '200':
+          description: Pokémon updated successfully
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '404':
+          description: Pokémon not found
+
+    delete:
+      tags:
+        - Pokemon
+      summary: Delete a Pokémon
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Pokémon unique identifier
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Pokémon deleted successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Pokémon not found
+
+components:
+  schemas:
+    CreatePokemonRequest:
+      type: object
+      required:
+        - name
+        - types
+        - description
+        - region
+        - maxLevel
+        - maxHp
+        - maxAttack
+        - maxDefense
+      properties:
+        name:
+          type: string
+          example: Pikachu
+        types:
+          type: array
+          items:
+            type: string
+          example:
+            - Electric
+        description:
+          type: string
+          example: Small yellow Pokémon able to generate electricity
+        region:
+          type: string
+          example: Kanto
+        maxLevel:
+          type: integer
+          example: 100
+        maxHp:
+          type: integer
+          example: 380
+        maxAttack:
+          type: integer
+          example: 250
+        maxDefense:
+          type: integer
+          example: 180
+
+    UpdatePokemonRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Pikachu
+        types:
+          type: array
+          items:
+            type: string
+          example:
+            - Electric
+        description:
+          type: string
+          example: Updated electric Pokémon description
+        region:
+          type: string
+          example: Kanto
+        maxLevel:
+          type: integer
+          example: 100
+        maxHp:
+          type: integer
+          example: 400
+        maxAttack:
+          type: integer
+          example: 260
+        maxDefense:
+          type: integer
+          example: 190

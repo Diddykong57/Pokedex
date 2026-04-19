@@ -37,6 +37,7 @@
         "jest": "^29.7.0",
         "jiti": "^2.6.1",
         "prettier": "^3.8.3",
+        "swagger-ui-dist": "^5.32.4",
         "ts-jest": "^29.4.9",
         "tsx": "^4.21.0",
         "typescript": "^6.0.3",
