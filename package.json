@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "APP_ENV=local tsx src/local.ts",
         "build": "tsc",
+        "deploy": "sam build && sam deploy",
         "test": "jest",
         "lint": "eslint .",
         "lint:fix": "npm run lint -- --fix",
