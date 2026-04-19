@@ -14,6 +14,7 @@ export async function handleRequest<Result>(
             body: JSON.stringify(result),
         };
     } catch (error: unknown) {
+        console.error("[Details] Pokedex error:", error);
         return toApiErrorResponse(error);
     }
 }
