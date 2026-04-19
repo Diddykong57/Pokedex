@@ -1,20 +1,22 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Pokedex healthCheck only
+Description: Pokedex API
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    CodeUri: .
+    MemorySize: 128
+    Timeout: 10
+    Environment:
+      Variables:
+        APP_ENV: aws
 
 Resources:
   HealthCheckFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: pokedex-healthcheck
-      Runtime: nodejs24.x
-      CodeUri: src/handlers/
-      Handler: healthCheck.healthCheckHandler
-      MemorySize: 128
-      Timeout: 10
-      Environment:
-        Variables:
-          APP_ENV: aws
+      Handler: src/handlers/healthCheck.healthCheckHandler
       Events:
         HealthCheckApi:
           Type: Api
@@ -26,11 +28,53 @@ Resources:
       BuildProperties:
         EntryPoints:
           - src/handlers/healthCheck.ts
-        Target: "node24"
-        Sourcemap: true
-        Minify: false
+        Target: node22
+
+  PokedexFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/pokemon/index.handler
+      Environment:
+        Variables:
+          TABLE_NAME: pokedex-dynamo
+      Events:
+        PokemonGetList:
+          Type: Api
+          Properties:
+            Path: /pokemon
+            Method: get
+        PokemonCreate:
+          Type: Api
+          Properties:
+            Path: /pokemon
+            Method: post
+        PokemonGetDetails:
+          Type: Api
+          Properties:
+            Path: /pokemon/{id}
+            Method: get
+        PokemonUpdate:
+          Type: Api
+          Properties:
+            Path: /pokemon/{id}
+            Method: put
+        PokemonDelete:
+          Type: Api
+          Properties:
+            Path: /pokemon/{id}
+            Method: delete
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/handlers/pokemon/index.ts
+        Target: node22
 
 Outputs:
   HealthCheckApiUrl:
-    Description: URL de l'endpoint healthCheck
+    Description: URL healthCheck
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/healthCheck"
+
+  PokedexApiUrl:
+    Description: URL API pokemon
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/pokemon"
