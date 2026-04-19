@@ -13,6 +13,16 @@ Globals:
         APP_ENV: aws
 
 Resources:
+  PokedexApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: arn:aws:cognito-idp:eu-north-1:630956767633:userpool/eu-north-1_8obb1hQXa
+
   HealthCheckFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -21,8 +31,11 @@ Resources:
         HealthCheckApi:
           Type: Api
           Properties:
+            RestApiId: !Ref PokedexApi
             Path: /healthCheck
             Method: get
+            Auth:
+              Authorizer: NONE
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -44,26 +57,39 @@ Resources:
         PokemonGetList:
           Type: Api
           Properties:
+            RestApiId: !Ref PokedexApi
             Path: /pokemon
             Method: get
+            Auth:
+              Authorizer: NONE
+
         PokemonCreate:
           Type: Api
           Properties:
+            RestApiId: !Ref PokedexApi
             Path: /pokemon
             Method: post
+
         PokemonGetDetails:
           Type: Api
           Properties:
+            RestApiId: !Ref PokedexApi
             Path: /pokemon/{id}
             Method: get
+            Auth:
+              Authorizer: NONE
+
         PokemonUpdate:
           Type: Api
           Properties:
+            RestApiId: !Ref PokedexApi
             Path: /pokemon/{id}
             Method: put
+
         PokemonDelete:
           Type: Api
           Properties:
+            RestApiId: !Ref PokedexApi
             Path: /pokemon/{id}
             Method: delete
     Metadata:
@@ -76,8 +102,8 @@ Resources:
 Outputs:
   HealthCheckApiUrl:
     Description: URL healthCheck
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/healthCheck"
+    Value: !Sub "https://${PokedexApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/healthCheck"
 
   PokedexApiUrl:
     Description: URL API pokemon
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/pokemon"
+    Value: !Sub "https://${PokedexApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/pokemon"
