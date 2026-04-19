@@ -2,15 +2,16 @@ import { getFakeDb } from "./repositories/impl/local/localPokemonRepository";
 import { handler as createPokemonHandler } from "./handlers/pokemon/createPokemon";
 import { handler as getPokemonListHandler} from "./handlers/pokemon/getPokemonList";
 import { handler as getPokemonDetailsHandler} from "./handlers/pokemon/getPokemonDetails";
-import { pokemonFixture } from "./tests/fixtures/pokemon";
+import { handler as updatePokemonHandler} from "./handlers/pokemon/updatePokemon";
+import {pokemonCreateFixture, pokemonUpdateFixture} from "./tests/fixtures/pokemon";
 import type {ApiResponse} from "./global/types/api";
 
 async function main() {
     let response: ApiResponse;
-    await createPokemonHandler({ body: JSON.stringify(pokemonFixture[0]) });
-    await createPokemonHandler({ body: JSON.stringify(pokemonFixture[1]) });
-    await createPokemonHandler({ body: JSON.stringify(pokemonFixture[2]) });
-    await createPokemonHandler({ body: JSON.stringify(pokemonFixture[3]) });
+    await createPokemonHandler({ body: JSON.stringify(pokemonCreateFixture[0]) });
+    await createPokemonHandler({ body: JSON.stringify(pokemonCreateFixture[1]) });
+    await createPokemonHandler({ body: JSON.stringify(pokemonCreateFixture[2]) });
+    await createPokemonHandler({ body: JSON.stringify(pokemonCreateFixture[3]) });
 
     response = await getPokemonListHandler();
 
@@ -23,6 +24,16 @@ async function main() {
     response = await getPokemonDetailsHandler(id);
 
     console.log("[getPokemonDetailsHandler] HTTP response:");
+    console.log(response);
+
+    response = await updatePokemonHandler({
+        pathParameters: {
+            id,
+        },
+        body: JSON.stringify(pokemonUpdateFixture),
+    });
+
+    console.log("[updatePokemonHandler] HTTP response:");
     console.log(response);
     // console.log("Fake DB content:");
     // console.dir(getFakeDb(), { depth: null });

@@ -1,4 +1,4 @@
-export const pokemonFixture = [
+export const pokemonCreateFixture = [
     {
         name: "Pikachu",
         types: ["Electric"],
@@ -41,3 +41,14 @@ export const pokemonFixture = [
         maxDefense: 203,
     },
 ];
+
+export const pokemonUpdateFixture = {
+    name: "Carapuce",
+    types: ["Eau"],
+    description: "Petit Pokémon tortue à la carapace solide, utilisant de puissants jets d’eau",
+    region: "Kanto",
+    maxLevel: 110,
+    maxHp: 400,
+    maxAttack: 250,
+    maxDefense: 251,
+}

@@ -4,7 +4,7 @@ import type { PokemonService } from "../../services/pokemonService";
 import { PokemonServiceImpl } from "../../services/impl/pokemonServiceImpl";
 import type { ApiResponse } from "../../global/types/api";
 import { handleRequest } from "../utils/handleRequest";
-import {toPokemonListResponseDto, toPokemonResponseDto} from "../../mappers/pokemonMapper";
+import { toPokemonResponseDto } from "../../mappers/pokemonMapper";
 
 const repository: PokemonRepository = new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);

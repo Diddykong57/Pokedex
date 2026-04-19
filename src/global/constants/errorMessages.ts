@@ -7,6 +7,7 @@ export const ERROR_MESSAGES = {
     FORBIDDEN: "Access restrict",
     URL_NOT_FOUND: "Url not found",
     MISSING_BODY: "Body is missing",
+    MISSING_ID: "ID in parameters is missing",
     ITEM_NOT_FOUND: "Item not found",
 
     // Server error

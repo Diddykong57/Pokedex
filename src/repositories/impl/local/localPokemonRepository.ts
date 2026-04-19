@@ -27,17 +27,8 @@ export class LocalPokemonRepository implements PokemonRepository {
     async getPokemonDetails(id: string): Promise<Pokemon> {
         const pk = `${POKEMON_ITEM.PK_PREFIX}#${id}`;
 
-        const metadata = fakeDb.find(
-            (item): item is PokemonMetadataItem =>
-                item.PK === pk &&
-                item.SK === POKEMON_ITEM.METADATA.SK
-        );
-
-        const stats = fakeDb.find(
-            (item): item is PokemonStatsItem =>
-                item.PK === pk &&
-                item.SK === POKEMON_ITEM.STATS.SK
-        );
+        const metadata = await this.getMetadata(pk);
+        const stats = await this.getStats(pk);
 
         if (!metadata || !stats){
             throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND)
@@ -45,7 +36,75 @@ export class LocalPokemonRepository implements PokemonRepository {
 
         return toPokemonDetails(metadata, stats);
     }
+
+    async updatePokemon(pokemon: Pokemon): Promise<void> {
+        const [metadataItem, statsItem] = toPokemonItems(pokemon);
+        const pk = `${POKEMON_ITEM.PK_PREFIX}#${pokemon.id}`;
+
+        const metadataIndex = await this.getMetadataIndex(pk);
+        const statsIndex = await this.getStatsIndex(pk);
+
+        fakeDb[metadataIndex] = metadataItem;
+        fakeDb[statsIndex] = statsItem;
+    }
+
+    private async getMetadata(pk: string): Promise<PokemonMetadataItem> {
+        const metadata = fakeDb.find(
+            (item): item is PokemonMetadataItem =>
+                item.PK === pk &&
+                item.SK === POKEMON_ITEM.METADATA.SK
+        );
+
+        if (!metadata) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
+
+        return metadata;
+    }
+
+    private async getStats(pk: string): Promise<PokemonStatsItem> {
+        const stats = fakeDb.find(
+            (item): item is PokemonStatsItem =>
+                item.PK === pk &&
+                item.SK === POKEMON_ITEM.STATS.SK
+        );
+
+        if (!stats) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
+
+        return stats;
+    }
+
+    private async getMetadataIndex(pk: string): Promise<number> {
+        const index = fakeDb.findIndex(
+            (item): item is PokemonMetadataItem =>
+                item.PK === pk &&
+                item.SK === POKEMON_ITEM.METADATA.SK
+        );
+
+        if (index === -1) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
+
+        return index;
+    }
+
+    private async getStatsIndex(pk: string): Promise<number> {
+        const index = fakeDb.findIndex(
+            (item): item is PokemonStatsItem =>
+                item.PK === pk &&
+                item.SK === POKEMON_ITEM.STATS.SK
+        );
+
+        if (!index) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
+
+        return index;
+    }
 }
+
 
 export function getFakeDb() {
     return fakeDb;
