@@ -36,7 +36,7 @@ export class DynamoPokemonRepository implements PokemonRepository {
     }
 
     async deletePokemon(id: string): Promise<void> {
-        const pk = `${POKEMON_ITEM.PK_PREFIX}#${id}`;
+        const pk = this.buildPk(id);
 
         const metadataResponse = await docClient.send(
             new DeleteCommand({
@@ -66,7 +66,7 @@ export class DynamoPokemonRepository implements PokemonRepository {
     }
 
     async getPokemonDetails(id: string): Promise<Pokemon> {
-        const pk = `${POKEMON_ITEM.PK_PREFIX}#${id}`;
+        const pk = this.buildPk(id);
 
         const metadata = await this.getMetadata(pk);
         const stats = await this.getStats(pk);
@@ -147,5 +147,9 @@ export class DynamoPokemonRepository implements PokemonRepository {
         }
 
         return response.Item as PokemonStatsItem;
+    }
+
+    private buildPk(id): string {
+        return `${POKEMON_ITEM.PK_PREFIX}#${id}`;
     }
 }
