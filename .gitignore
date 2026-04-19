@@ -3,3 +3,4 @@ dist
 .env
 models-dynamoDB
 coverage
+.aws-sam
