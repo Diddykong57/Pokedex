@@ -7,5 +7,6 @@ export interface ApiRequest {
 
 export interface ApiResponse {
     statusCode: number;
+    headers?: Record<string, string>;
     body: string;
 }
