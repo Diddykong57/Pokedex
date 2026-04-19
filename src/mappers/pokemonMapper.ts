@@ -1,6 +1,6 @@
-import { Pokemon } from "../models/pokemon";
+import {Pokemon, PokemonListItem} from "../models/pokemon";
 import type { PokemonMetadataItem, PokemonStatsItem } from "../repositories/types/pokemonItem";
-import type { PokemonResponseDto } from "../dto/pokemon/pokemonResponse.dto";
+import type {PokemonListResponseDto, PokemonResponseDto} from "../dto/pokemon/pokemonResponse.dto";
 import { POKEMON_ITEM } from "../global/constants/pokemon";
 
 export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonStatsItem] => {
@@ -32,6 +32,15 @@ export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonS
     ];
 };
 
+export const toPokemonFromMetadataItem = (item: PokemonMetadataItem): PokemonListItem => ({
+    id: item.PK.replace("POKEMON#", ""),
+    name: item.name,
+    types: item.types,
+    description: item.description,
+    region: item.region,
+    createdAt: item.createdAt
+});
+
 export const toPokemonResponseDto = (pokemon: Pokemon): PokemonResponseDto => ({
     id: pokemon.id,
     name: pokemon.name,
@@ -44,3 +53,11 @@ export const toPokemonResponseDto = (pokemon: Pokemon): PokemonResponseDto => ({
     maxDefense: pokemon.maxDefense,
     createdAt: pokemon.createdAt,
 });
+
+export const toPokemonListResponseDto = (pokemon: PokemonListItem): PokemonListResponseDto => ({
+    id: pokemon.id,
+    name: pokemon.name,
+    types: pokemon.types,
+    description: pokemon.description,
+    region: pokemon.region,
+})

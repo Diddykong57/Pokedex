@@ -1,6 +1,6 @@
 import type { PokemonRepository } from "../../repositories/pokemonRepository";
 import type { CreatePokemonRequestDto } from "../../dto/pokemon/createPokemonRequest.dto";
-import type { Pokemon } from "../../models/pokemon";
+import type {Pokemon, PokemonListItem} from "../../models/pokemon";
 import type { PokemonService } from "../pokemonService";
 import { generateId } from "../../utils/idUtils";
 import { getCurrentDate } from "../../utils/dateUtils";
@@ -26,5 +26,9 @@ export class PokemonServiceImpl implements PokemonService {
         };
         await this.pokemonRepository.create(pokemon);
         return pokemon;
+    }
+
+    async getPokemonList(): Promise<PokemonListItem[]> {
+        return this.pokemonRepository.getPokemonList();
     }
 }

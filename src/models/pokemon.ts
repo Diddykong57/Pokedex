@@ -10,3 +10,12 @@ export interface Pokemon {
     maxDefense: number;
     createdAt: string;
 }
+
+export interface PokemonListItem {
+    id: string;
+    name: string;
+    types: string[];
+    description: string;
+    region: string;
+    createdAt: string;
+}

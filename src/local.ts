@@ -1,29 +1,20 @@
-import { handler } from "./handlers/pokemon/createPokemon";
+import { handler as createPokemonHandler } from "./handlers/pokemon/createPokemon";
 import { getFakeDb } from "./repositories/impl/local/localPokemonRepository";
+import {handler} from "./handlers/pokemon/getPokemonList";
+import {pokemonFixture} from "./tests/fixtures/pokemon";
 
 async function main() {
-    // const response = await handler({
-    //     body: JSON.stringify({
-    //         name: "Pikachu",
-    //         types: ["Electric"],
-    //         description:
-    //             "Petit et jaune auux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
-    //         region: "Kanto",
-    //         maxLevel: 100,
-    //         maxHp: 380,
-    //         maxAttack: 250,
-    //         maxDefense: 180,
-    //     }),
-    // });
-    const response = await handler({
-        body: null,
-    });
+    await createPokemonHandler({body: JSON.stringify(pokemonFixture[0])});
+    await createPokemonHandler({body: JSON.stringify(pokemonFixture[1])});
+    await createPokemonHandler({body: JSON.stringify(pokemonFixture[2])});
+    await createPokemonHandler({body: JSON.stringify(pokemonFixture[3])});
+
+    const response = await handler();
 
     console.log("HTTP response:");
     console.log(response);
-
-    console.log("Fake DB content:");
-    console.dir(getFakeDb(), { depth: null });
+    // console.log("Fake DB content:");
+    // console.dir(getFakeDb(), { depth: null });
 }
 
 main();

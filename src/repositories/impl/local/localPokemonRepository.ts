@@ -1,7 +1,8 @@
-import type { Pokemon } from "../../../models/pokemon";
-import { toPokemonItems } from "../../../mappers/pokemonMapper";
+import type {Pokemon, PokemonListItem} from "../../../models/pokemon";
+import {toPokemonFromMetadataItem, toPokemonItems} from "../../../mappers/pokemonMapper";
 import type { PokemonRepository } from "../../pokemonRepository";
-import type { PokemonItem } from "../../types/pokemonItem";
+import type {PokemonItem, PokemonMetadataItem} from "../../types/pokemonItem";
+import {POKEMON_ITEM} from "../../../global/constants/pokemon";
 
 const fakeDb: PokemonItem[] = [];
 
@@ -12,6 +13,15 @@ export class LocalPokemonRepository implements PokemonRepository {
 
         fakeDb.push(metadataItem);
         fakeDb.push(statsItem);
+    }
+
+    async getPokemonList(): Promise<PokemonListItem[]> {
+        const pokemonList = fakeDb.filter(
+            item =>
+                item.SK === POKEMON_ITEM.METADATA.SK &&
+                item.GSI1PK === POKEMON_ITEM.METADATA.GSI1PK
+        ) as PokemonMetadataItem[]
+        return pokemonList.map(item => toPokemonFromMetadataItem(item));
     }
 }
 
