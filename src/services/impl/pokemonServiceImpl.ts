@@ -51,4 +51,8 @@ export class PokemonServiceImpl implements PokemonService {
 
         return updatedPokemon;
     }
+
+    async deletePokemon(pk: string): Promise<void> {
+        await this.pokemonRepository.deletePokemon(pk);
+    }
 }

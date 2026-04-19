@@ -5,6 +5,7 @@ import { getPokemonDetailsHandler } from "./handlers/pokemon/getPokemonDetails";
 import { updatePokemonHandler } from "./handlers/pokemon/updatePokemon";
 import { pokemonCreateFixture, pokemonUpdateFixture } from "./tests/fixtures/pokemon";
 import type { ApiResponse } from "./global/types/api";
+import {deletePokemonHandler} from "./handlers/pokemon/deletePokemon";
 
 async function main() {
     let response: ApiResponse;
@@ -35,6 +36,18 @@ async function main() {
 
     console.log("[updatePokemonHandler] HTTP response:");
     console.log(response);
+
+    response = await deletePokemonHandler({pathParameters: {id}});
+
+    console.log("[deletePokemonHandler] HTTP response:");
+    console.log(response);
+
+    response = await getPokemonListHandler();
+
+    console.log("[getPokemonListHandler] HTTP response:");
+    console.log(response);
+
+
     // console.log("Fake DB content:");
     // console.dir(getFakeDb(), { depth: null });
 }

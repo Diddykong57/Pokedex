@@ -48,6 +48,16 @@ export class LocalPokemonRepository implements PokemonRepository {
         fakeDb[statsIndex] = statsItem;
     }
 
+    async deletePokemon(id: string): Promise<void> {
+        const pk = `${POKEMON_ITEM.PK_PREFIX}#${id}`;
+
+        const metadataIndex = await this.getMetadataIndex(pk);
+        const statsIndex = await this.getStatsIndex(pk);
+
+        fakeDb.splice(metadataIndex, 1);
+        fakeDb.splice(statsIndex, 1);
+    }
+
     private async getMetadata(pk: string): Promise<PokemonMetadataItem> {
         const metadata = fakeDb.find(
             (item): item is PokemonMetadataItem => item.PK === pk && item.SK === POKEMON_ITEM.METADATA.SK
