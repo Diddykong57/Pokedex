@@ -4,6 +4,7 @@ export const ERROR_MESSAGES = {
     BAD_CREDENTIALS: "Bad credentials",
     UNAUTHORIZED: "Unauthorized",
     INVALID_JSON: "Invalid JSON format",
+    INVALID_METHOD: "Invalid JSON format",
     FORBIDDEN: "Access restrict",
     URL_NOT_FOUND: "Url not found",
     MISSING_BODY: "Body is missing",
