@@ -1,5 +1,5 @@
 export interface ApiRequest {
-    body: string | null;
+    body?: string | null;
     pathParameters?: {
         id?: string;
     };

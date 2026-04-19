@@ -21,7 +21,7 @@ async function main() {
     const parsedBody = JSON.parse(response.body);
     const id = parsedBody[0].id;
 
-    response = await getPokemonDetailsHandler(id);
+    response = await getPokemonDetailsHandler({pathParameters: {id}});
 
     console.log("[getPokemonDetailsHandler] HTTP response:");
     console.log(response);
