@@ -31,4 +31,78 @@ export class DynamoPokemonRepository implements PokemonRepository {
             })
         );
     }
+
+    async deletePokemon(id: string): Promise<void> {
+
+    }
+
+    async getPokemonDetails(id: string): Promise<Pokemon> {
+        const pk = `${POKEMON_ITEM.PK_PREFIX}#${id}`;
+
+        const metadata = await this.getMetadata(pk);
+        const stats = await this.getStats(pk);
+
+        if (!metadata || !stats) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
+
+        return toPokemonDetails(metadata, stats);
+    }
+
+    async getPokemonList(): Promise<PokemonListItem[]> {
+        const response = await docClient.send(
+            new ScanCommand({
+                TableName: process.env.TABLE_NAME,
+                FilterExpression: "SK = :sk AND GSI1PK = :gsi1pk",
+                ExpressionAttributeValues: {
+                    ":sk": POKEMON_ITEM.METADATA.SK,
+                    ":gsi1pk": POKEMON_ITEM.METADATA.GSI1PK,
+                },
+            })
+        );
+
+        const pokemonList = (response.Items ?? []) as PokemonMetadataItem[];
+
+        return pokemonList.map(item => toPokemonFromMetadataItem(item));
+    }
+
+    async updatePokemon(pokemon: Pokemon): Promise<void> {
+
+    }
+
+    private async getMetadata(pk: string): Promise<PokemonMetadataItem> {
+        const response = await docClient.send(
+            new GetCommand({
+                TableName: process.env.TABLE_NAME,
+                Key: {
+                    PK: pk,
+                    SK: POKEMON_ITEM.METADATA.SK,
+                },
+            })
+        );
+
+        if (!response.Item) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
+
+        return response.Item as PokemonMetadataItem;
+    }
+
+    private async getStats(pk: string): Promise<PokemonStatsItem> {
+        const response = await docClient.send(
+            new GetCommand({
+                TableName: process.env.TABLE_NAME,
+                Key: {
+                    PK: pk,
+                    SK: POKEMON_ITEM.STATS.SK,
+                },
+            })
+        );
+
+        if (!response.Item) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
+
+        return response.Item as PokemonStatsItem;
+    }
 }
