@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Pokedex healthCheck only
+
+Resources:
+  HealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: pokedex-healthcheck
+      Runtime: nodejs24.x
+      CodeUri: src/handlers/
+      Handler: healthCheck.healthCheckHandler
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          APP_ENV: aws
+      Events:
+        HealthCheckApi:
+          Type: Api
+          Properties:
+            Path: /healthCheck
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/handlers/healthCheck.ts
+        Target: "node24"
+        Sourcemap: true
+        Minify: false
+
+Outputs:
+  HealthCheckApiUrl:
+    Description: URL de l'endpoint healthCheck
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/healthCheck"
