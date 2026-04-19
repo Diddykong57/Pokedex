@@ -10,8 +10,12 @@ import { handleRequest } from "../utils/handleRequest";
 import { HTTP } from "../../global/constants/httpStatus";
 import { createPokemonSchema } from "../../validators/pokemonSchema";
 import { validateSchema } from "../../validators/schemaValidator";
+import {DynamoPokemonRepository} from "../../repositories/impl/dynamoDB/dynamoPokemonRepository";
 
-const repository: PokemonRepository = new LocalPokemonRepository();
+const repository: PokemonRepository =
+    process.env.APP_ENV === "aws"
+        ? new DynamoPokemonRepository()
+        : new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
 
 export const createPokemonHandler = async (event: ApiRequest): Promise<ApiResponse> => {
