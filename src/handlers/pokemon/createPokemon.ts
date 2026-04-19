@@ -1,7 +1,4 @@
-import { LocalPokemonRepository } from "../../repositories/impl/local/localPokemonRepository";
-import { PokemonServiceImpl } from "../../services/impl/pokemonServiceImpl";
 import type { PokemonService } from "../../services/pokemonService";
-import type { PokemonRepository } from "../../repositories/pokemonRepository";
 import { toPokemonResponseDto } from "../../mappers/pokemonMapper";
 import type { ApiRequest, ApiResponse } from "../../global/types/api";
 import { badRequestError } from "../../utils/errorUtils";
@@ -10,15 +7,8 @@ import { handleRequest } from "../utils/handleRequest";
 import { HTTP } from "../../global/constants/httpStatus";
 import { createPokemonSchema } from "../../validators/pokemonSchema";
 import { validateSchema } from "../../validators/schemaValidator";
-import {DynamoPokemonRepository} from "../../repositories/impl/dynamoDB/dynamoPokemonRepository";
 
-const repository: PokemonRepository =
-    process.env.APP_ENV === "aws"
-        ? new DynamoPokemonRepository()
-        : new LocalPokemonRepository();
-const service: PokemonService = new PokemonServiceImpl(repository);
-
-export const createPokemonHandler = async (event: ApiRequest): Promise<ApiResponse> => {
+export const createPokemonHandler = async (service: PokemonService, event: ApiRequest): Promise<ApiResponse> => {
     return handleRequest(async () => {
         if (!event.body) {
             throw badRequestError(ERROR_MESSAGES.MISSING_BODY);
