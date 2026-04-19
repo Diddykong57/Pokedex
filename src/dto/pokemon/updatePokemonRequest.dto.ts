@@ -1,3 +1,3 @@
-import type {CreatePokemonRequestDto} from "./createPokemonRequest.dto";
+import type { CreatePokemonRequestDto } from "./createPokemonRequest.dto";
 
 export type UpdatePokemonRequestDto = Partial<CreatePokemonRequestDto>;

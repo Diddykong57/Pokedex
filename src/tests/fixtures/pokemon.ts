@@ -51,4 +51,4 @@ export const pokemonUpdateFixture = {
     maxHp: 400,
     maxAttack: 250,
     maxDefense: 251,
-}
+};

@@ -1,10 +1,10 @@
 import type { Pokemon, PokemonListItem } from "../../../models/pokemon";
-import {toPokemonDetails, toPokemonFromMetadataItem, toPokemonItems} from "../../../mappers/pokemonMapper";
+import { toPokemonDetails, toPokemonFromMetadataItem, toPokemonItems } from "../../../mappers/pokemonMapper";
 import type { PokemonRepository } from "../../pokemonRepository";
-import type {PokemonItem, PokemonMetadataItem, PokemonStatsItem} from "../../types/pokemonItem";
+import type { PokemonItem, PokemonMetadataItem, PokemonStatsItem } from "../../types/pokemonItem";
 import { POKEMON_ITEM } from "../../../global/constants/pokemon";
-import {notFoundError} from "../../../utils/errorUtils";
-import {ERROR_MESSAGES} from "../../../global/constants/errorMessages";
+import { notFoundError } from "../../../utils/errorUtils";
+import { ERROR_MESSAGES } from "../../../global/constants/errorMessages";
 
 const fakeDb: PokemonItem[] = [];
 
@@ -30,8 +30,8 @@ export class LocalPokemonRepository implements PokemonRepository {
         const metadata = await this.getMetadata(pk);
         const stats = await this.getStats(pk);
 
-        if (!metadata || !stats){
-            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND)
+        if (!metadata || !stats) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
         }
 
         return toPokemonDetails(metadata, stats);
@@ -50,9 +50,7 @@ export class LocalPokemonRepository implements PokemonRepository {
 
     private async getMetadata(pk: string): Promise<PokemonMetadataItem> {
         const metadata = fakeDb.find(
-            (item): item is PokemonMetadataItem =>
-                item.PK === pk &&
-                item.SK === POKEMON_ITEM.METADATA.SK
+            (item): item is PokemonMetadataItem => item.PK === pk && item.SK === POKEMON_ITEM.METADATA.SK
         );
 
         if (!metadata) {
@@ -64,9 +62,7 @@ export class LocalPokemonRepository implements PokemonRepository {
 
     private async getStats(pk: string): Promise<PokemonStatsItem> {
         const stats = fakeDb.find(
-            (item): item is PokemonStatsItem =>
-                item.PK === pk &&
-                item.SK === POKEMON_ITEM.STATS.SK
+            (item): item is PokemonStatsItem => item.PK === pk && item.SK === POKEMON_ITEM.STATS.SK
         );
 
         if (!stats) {
@@ -78,9 +74,7 @@ export class LocalPokemonRepository implements PokemonRepository {
 
     private async getMetadataIndex(pk: string): Promise<number> {
         const index = fakeDb.findIndex(
-            (item): item is PokemonMetadataItem =>
-                item.PK === pk &&
-                item.SK === POKEMON_ITEM.METADATA.SK
+            (item): item is PokemonMetadataItem => item.PK === pk && item.SK === POKEMON_ITEM.METADATA.SK
         );
 
         if (index === -1) {
@@ -92,9 +86,7 @@ export class LocalPokemonRepository implements PokemonRepository {
 
     private async getStatsIndex(pk: string): Promise<number> {
         const index = fakeDb.findIndex(
-            (item): item is PokemonStatsItem =>
-                item.PK === pk &&
-                item.SK === POKEMON_ITEM.STATS.SK
+            (item): item is PokemonStatsItem => item.PK === pk && item.SK === POKEMON_ITEM.STATS.SK
         );
 
         if (!index) {
@@ -104,7 +96,6 @@ export class LocalPokemonRepository implements PokemonRepository {
         return index;
     }
 }
-
 
 export function getFakeDb() {
     return fakeDb;
