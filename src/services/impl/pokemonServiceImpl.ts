@@ -5,8 +5,8 @@ import type { PokemonService } from "../pokemonService";
 import { generateId } from "../../utils/idUtils";
 import { getCurrentDate } from "../../utils/dateUtils";
 import type { UpdatePokemonRequestDto } from "../../dto/pokemon/updatePokemonRequest.dto";
-import {conflictError} from "../../utils/errorUtils";
-import type {PokemonListResponseDto, PokemonResponseDto} from "../../dto/pokemon/pokemonResponse.dto";
+import { conflictError } from "../../utils/errorUtils";
+import type { PokemonListResponseDto, PokemonResponseDto } from "../../dto/pokemon/pokemonResponse.dto";
 
 export class PokemonServiceImpl implements PokemonService {
     constructor(private readonly pokemonRepository: PokemonRepository) {}
@@ -14,7 +14,7 @@ export class PokemonServiceImpl implements PokemonService {
     async createPokemon(data: CreatePokemonRequestDto): Promise<PokemonResponseDto> {
         const existingPokemon = await this.pokemonRepository.getPokemonDetailsByName(data.name);
 
-        if (existingPokemon){
+        if (existingPokemon) {
             throw conflictError();
         }
 

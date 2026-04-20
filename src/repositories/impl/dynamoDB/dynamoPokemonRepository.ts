@@ -1,16 +1,12 @@
-import type {Pokemon, PokemonListItem} from "../../../models/pokemon";
-import {toPokemonDetails, toPokemonFromMetadataItem, toPokemonItems} from "../../../mappers/pokemonMapper";
+import type { Pokemon, PokemonListItem } from "../../../models/pokemon";
+import { toPokemonDetails, toPokemonFromMetadataItem, toPokemonItems } from "../../../mappers/pokemonMapper";
 import type { PokemonRepository } from "../../pokemonRepository";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import {
-    PutCommand,
-    DynamoDBDocumentClient,
-    DeleteCommand, GetCommand, ScanCommand,
-} from "@aws-sdk/lib-dynamodb";
-import {POKEMON_ITEM} from "../../../global/constants/pokemon";
-import type {PokemonMetadataItem, PokemonStatsItem} from "../../types/pokemonItem";
-import {notFoundError} from "../../../utils/errorUtils";
-import {ERROR_MESSAGES} from "../../../global/constants/errorMessages";
+import { PutCommand, DynamoDBDocumentClient, DeleteCommand, GetCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { POKEMON_ITEM } from "../../../global/constants/pokemon";
+import type { PokemonMetadataItem, PokemonStatsItem } from "../../types/pokemonItem";
+import { notFoundError } from "../../../utils/errorUtils";
+import { ERROR_MESSAGES } from "../../../global/constants/errorMessages";
 
 const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
@@ -31,7 +27,7 @@ export class DynamoPokemonRepository implements PokemonRepository {
                 Key: {
                     PK: pk,
                     SK: POKEMON_ITEM.METADATA.SK,
-                }
+                },
             })
         );
 
@@ -41,7 +37,7 @@ export class DynamoPokemonRepository implements PokemonRepository {
                 Key: {
                     PK: pk,
                     SK: POKEMON_ITEM.STATS.SK,
-                }
+                },
             })
         );
     }
@@ -71,7 +67,7 @@ export class DynamoPokemonRepository implements PokemonRepository {
             })
         );
 
-        const metadataItem = (response.Items?.[0] as PokemonMetadataItem | undefined);
+        const metadataItem = response.Items?.[0] as PokemonMetadataItem | undefined;
 
         if (!metadataItem) {
             return null;

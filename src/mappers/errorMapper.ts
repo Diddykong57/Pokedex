@@ -8,8 +8,8 @@ export function toApiErrorResponse(error: unknown): ApiResponse {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Requested-With",
         "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-        "Content-Type": "application/json"
-    }
+        "Content-Type": "application/json",
+    };
     if (isHttpError(error)) {
         // Get error.details.details if present, otherwise undefined
         const details = (error.details as { details?: string[] } | undefined)?.details;

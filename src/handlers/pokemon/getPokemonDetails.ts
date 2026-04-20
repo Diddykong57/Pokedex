@@ -1,9 +1,9 @@
 import type { PokemonService } from "../../services/pokemonService";
-import type {ApiRequest, ApiResponse} from "../../global/types/api";
+import type { ApiRequest, ApiResponse } from "../../global/types/api";
 import { handleRequest } from "../utils/handleRequest";
 import { toPokemonResponseDto } from "../../mappers/pokemonMapper";
-import {badRequestError} from "../../utils/errorUtils";
-import {ERROR_MESSAGES} from "../../global/constants/errorMessages";
+import { badRequestError } from "../../utils/errorUtils";
+import { ERROR_MESSAGES } from "../../global/constants/errorMessages";
 
 export const getPokemonDetailsHandler = async (service: PokemonService, event: ApiRequest): Promise<ApiResponse> => {
     return handleRequest(async () => {
