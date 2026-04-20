@@ -1,16 +1,17 @@
 import type { PokemonRepository } from "../../repositories/pokemonRepository";
 import type { CreatePokemonRequestDto } from "../../dto/pokemon/createPokemonRequest.dto";
-import type { Pokemon, PokemonListItem } from "../../models/pokemon";
+import type { Pokemon } from "../../models/pokemon";
 import type { PokemonService } from "../pokemonService";
 import { generateId } from "../../utils/idUtils";
 import { getCurrentDate } from "../../utils/dateUtils";
 import type { UpdatePokemonRequestDto } from "../../dto/pokemon/updatePokemonRequest.dto";
 import {conflictError} from "../../utils/errorUtils";
+import type {PokemonListResponseDto, PokemonResponseDto} from "../../dto/pokemon/pokemonResponse.dto";
 
 export class PokemonServiceImpl implements PokemonService {
     constructor(private readonly pokemonRepository: PokemonRepository) {}
 
-    async createPokemon(data: CreatePokemonRequestDto): Promise<Pokemon> {
+    async createPokemon(data: CreatePokemonRequestDto): Promise<PokemonResponseDto> {
         const existingPokemon = await this.pokemonRepository.getPokemonDetailsByName(data.name);
 
         if (existingPokemon){
@@ -36,15 +37,15 @@ export class PokemonServiceImpl implements PokemonService {
         return pokemon;
     }
 
-    async getPokemonList(): Promise<PokemonListItem[]> {
+    async getPokemonList(): Promise<PokemonListResponseDto[]> {
         return this.pokemonRepository.getPokemonList();
     }
 
-    async getPokemonDetails(id: string): Promise<Pokemon> {
+    async getPokemonDetails(id: string): Promise<PokemonResponseDto> {
         return this.pokemonRepository.getPokemonDetails(id);
     }
 
-    async updatePokemon(id: string, data: UpdatePokemonRequestDto): Promise<Pokemon> {
+    async updatePokemon(id: string, data: UpdatePokemonRequestDto): Promise<PokemonResponseDto> {
         const existingPokemon = await this.getPokemonDetails(id);
 
         const { name, ...updatableFields } = data;
