@@ -37,6 +37,21 @@ export class LocalPokemonRepository implements PokemonRepository {
         return toPokemonDetails(metadata, stats);
     }
 
+    async getPokemonDetailsByName(name: string): Promise<PokemonListItem | null> {
+        const metadata = fakeDb.find(
+            (item): item is PokemonMetadataItem =>
+                item.SK === POKEMON_ITEM.METADATA.SK &&
+                item.GSI1PK === POKEMON_ITEM.METADATA.GSI1PK &&
+                item.name === name
+        );
+
+        if (!metadata) {
+            return null;
+        }
+
+        return toPokemonFromMetadataItem(metadata);
+    }
+
     async updatePokemon(pokemon: Pokemon): Promise<void> {
         const [metadataItem, statsItem] = toPokemonItems(pokemon);
         const pk = `${POKEMON_ITEM.PK_PREFIX}#${pokemon.id}`;

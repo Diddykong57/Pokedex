@@ -5,11 +5,18 @@ import type { PokemonService } from "../pokemonService";
 import { generateId } from "../../utils/idUtils";
 import { getCurrentDate } from "../../utils/dateUtils";
 import type { UpdatePokemonRequestDto } from "../../dto/pokemon/updatePokemonRequest.dto";
+import {conflictError} from "../../utils/errorUtils";
 
 export class PokemonServiceImpl implements PokemonService {
     constructor(private readonly pokemonRepository: PokemonRepository) {}
 
     async createPokemon(data: CreatePokemonRequestDto): Promise<Pokemon> {
+        const existingPokemon = await this.pokemonRepository.getPokemonDetailsByName(data.name);
+
+        if (existingPokemon){
+            throw conflictError();
+        }
+
         const id = generateId();
         const now = getCurrentDate();
 

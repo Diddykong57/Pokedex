@@ -55,6 +55,31 @@ export class DynamoPokemonRepository implements PokemonRepository {
         return toPokemonDetails(metadata, stats);
     }
 
+    async getPokemonDetailsByName(name: string): Promise<PokemonListItem | null> {
+        const response = await docClient.send(
+            new ScanCommand({
+                TableName: this.tableName,
+                FilterExpression: "SK = :sk AND GSI1PK = :gsi1pk AND #name = :name",
+                ExpressionAttributeNames: {
+                    "#name": "name",
+                },
+                ExpressionAttributeValues: {
+                    ":sk": POKEMON_ITEM.METADATA.SK,
+                    ":gsi1pk": POKEMON_ITEM.METADATA.GSI1PK,
+                    ":name": name,
+                },
+            })
+        );
+
+        const metadataItem = (response.Items?.[0] as PokemonMetadataItem | undefined);
+
+        if (!metadataItem) {
+            return null;
+        }
+
+        return toPokemonFromMetadataItem(metadataItem);
+    }
+
     async getPokemonList(): Promise<PokemonListItem[]> {
         const response = await docClient.send(
             new ScanCommand({
