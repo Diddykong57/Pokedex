@@ -1,5 +1,9 @@
 window.onload = function () {
-    const redirectUrl = window.location.origin + "/docs/oauth2-redirect.html";
+    const isLocalhost = window.location.hostname === "localhost";
+
+    const basePath = isLocalhost ? "/docs" : "/Pokedex";
+
+    const redirectUrl = window.location.origin + basePath + "/oauth2-redirect.html";
 
     const ui = SwaggerUIBundle({
         url: "./openapi.yaml",
@@ -16,7 +20,7 @@ window.onload = function () {
     ui.initOAuth({
         clientId: "5e1sv0erm0h9nhhtvin5lh7cci",
         usePkceWithAuthorizationCodeGrant: true,
-        scopes: "openid email pokedex-api/write"
+        scopes: ["openid", "email", "pokedex-api/write"]
     });
 
     window.ui = ui;
