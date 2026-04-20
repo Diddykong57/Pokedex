@@ -6,7 +6,7 @@ info:
   description: REST API for managing a Pokémon catalog.
 
 servers:
-  - url: https://36ymd9qykj.execute-api.eu-north-1.amazonaws.com/Prod
+  - url: https://36ymd9qykj.execute-api.eu-north-1.amazonaws.com/prod
 
 tags:
   - name: HealthCheck
@@ -137,6 +137,7 @@ components:
         authorizationCode:
           authorizationUrl: https://eu-north-1h0xzhafid.auth.eu-north-1.amazoncognito.com/oauth2/authorize
           tokenUrl: https://eu-north-1h0xzhafid.auth.eu-north-1.amazoncognito.com/oauth2/token
+
           scopes:
             openid: OpenID scope
             email: Email scope

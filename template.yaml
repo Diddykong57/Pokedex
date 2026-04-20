@@ -21,7 +21,7 @@ Resources:
   PokedexApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Prod
+      StageName: prod
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
@@ -162,8 +162,8 @@ Resources:
 Outputs:
   HealthCheckApiUrl:
     Description: URL healthCheck
-    Value: !Sub "https://${PokedexApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/healthCheck"
+    Value: !Sub "https://${PokedexApi}.execute-api.${AWS::Region}.amazonaws.com/prod/healthCheck"
 
   PokedexApiUrl:
     Description: URL API pokemon
-    Value: !Sub "https://${PokedexApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/pokemon"
+    Value: !Sub "https://${PokedexApi}.execute-api.${AWS::Region}.amazonaws.com/prod/pokemon"
