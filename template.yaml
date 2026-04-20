@@ -1,7 +1,10 @@
+# SAM / CloudFormation template used to deploy the Pokedex API on AWS
+
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Pokedex API
 
+# Global configuration automatically applied to all Lambda functions
 Globals:
   Function:
     Runtime: nodejs22.x
@@ -13,6 +16,8 @@ Globals:
         APP_ENV: aws
 
 Resources:
+
+  # Main API Gateway REST API
   PokedexApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -26,12 +31,36 @@ Resources:
         AddDefaultAuthorizerToCorsPreflight: false
         Authorizers:
           CognitoAuthorizer:
-            UserPoolArn: arn:aws:cognito-idp:eu-north-1:630956767633:userpool/eu-north-1_8obb1hQXa
+            UserPoolArn: arn:aws:cognito-idp:eu-north-1:630956767633:userpool/eu-north-1_H0xZhAfId
 
+  # Add CORS headers on generic client errors (400, 403, 404...)
+  Default4xxGatewayResponse:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId: !Ref PokedexApi
+      ResponseType: DEFAULT_4XX
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+
+  # Add CORS headers specifically for Unauthorized (401)
+  UnauthorizedGatewayResponse:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId: !Ref PokedexApi
+      ResponseType: UNAUTHORIZED
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+
+  # Public Lambda used to check if API is alive
   HealthCheckFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/healthCheck.healthCheckHandler
+
       Events:
         HealthCheckApi:
           Type: Api
@@ -48,17 +77,24 @@ Resources:
           - src/handlers/healthCheck.ts
         Target: node22
 
+  # Main Lambda handling all Pokemon routes
   PokedexFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/pokemon/index.handler
+
       Environment:
         Variables:
-          TABLE_NAME: pokedex-dynamo
+          TABLE_NAME: pokedex-dynamo   # DynamoDB table name
+
+      # IAM permissions automatically generated for DynamoDB CRUD
       Policies:
         DynamoDBCrudPolicy:
-            TableName: pokedex-dynamo
+          TableName: pokedex-dynamo
+
       Events:
+
+        # Public route: list all Pokemon
         PokemonGetList:
           Type: Api
           Properties:
@@ -68,13 +104,21 @@ Resources:
             Auth:
               Authorizer: NONE
 
+        # Private route: create a Pokemon
         PokemonCreate:
           Type: Api
           Properties:
             RestApiId: !Ref PokedexApi
             Path: /pokemon
             Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
 
+              # Required Cognito scope
+              AuthorizationScopes:
+                - pokedex-api/write
+
+        # Public route: get one Pokemon by ID
         PokemonGetDetails:
           Type: Api
           Properties:
@@ -84,19 +128,30 @@ Resources:
             Auth:
               Authorizer: NONE
 
+        # Private route: update one Pokemon
         PokemonUpdate:
           Type: Api
           Properties:
             RestApiId: !Ref PokedexApi
             Path: /pokemon/{id}
             Method: put
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - pokedex-api/write
 
+        # Private route: delete one Pokemon
         PokemonDelete:
           Type: Api
           Properties:
             RestApiId: !Ref PokedexApi
             Path: /pokemon/{id}
             Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - pokedex-api/write
+
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

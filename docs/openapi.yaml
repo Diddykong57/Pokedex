@@ -37,6 +37,10 @@ paths:
       tags:
         - Pokemon
       summary: Create a new Pokémon
+      security:
+        - cognitoAuth:
+            - openid
+            - email
       requestBody:
         required: true
         content:
@@ -73,6 +77,11 @@ paths:
       tags:
         - Pokemon
       summary: Update an existing Pokémon
+      security:
+        - cognitoAuth:
+            - openid
+            - email
+            - pokedex-api/write
       parameters:
         - name: id
           in: path
@@ -100,6 +109,11 @@ paths:
       tags:
         - Pokemon
       summary: Delete a Pokémon
+      security:
+        - cognitoAuth:
+            - openid
+            - email
+            - pokedex-api/write
       parameters:
         - name: id
           in: path
@@ -116,6 +130,18 @@ paths:
           description: Pokémon not found
 
 components:
+  securitySchemes:
+    cognitoAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://eu-north-1h0xzhafid.auth.eu-north-1.amazoncognito.com/oauth2/authorize
+          tokenUrl: https://eu-north-1h0xzhafid.auth.eu-north-1.amazoncognito.com/oauth2/token
+          scopes:
+            openid: OpenID scope
+            email: Email scope
+            pokedex-api/write: Write access to Pokedex API
+
   schemas:
     CreatePokemonRequest:
       type: object
