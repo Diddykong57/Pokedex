@@ -9,4 +9,4 @@ export const POKEMON_ITEM = {
         SK: "STATS",
         ENTITY_TYPE: "POKEMON_STATS",
     },
-};
+} as const;
