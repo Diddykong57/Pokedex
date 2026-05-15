@@ -1,3 +1,4 @@
+import type { APIGatewayProxyEvent } from "aws-lambda";
 import { createPokemonHandler } from "./createPokemon";
 import { ERROR_MESSAGES } from "../../global/constants/errorMessages";
 import { getPokemonDetailsHandler } from "./getPokemonDetails";
@@ -14,7 +15,7 @@ const repository: PokemonRepository =
     process.env.APP_ENV === "aws" ? new DynamoPokemonRepository() : new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
 
-export const handler = async event => {
+export const handler = async (event: APIGatewayProxyEvent) => {
     switch (event.httpMethod) {
         case "POST":
             return createPokemonHandler(service, event);
