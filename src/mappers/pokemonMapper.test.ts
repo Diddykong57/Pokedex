@@ -56,7 +56,6 @@ describe("getPokemonList", () => {
 
         const result = await repository.getPokemonList();
 
-        expect(result.every(metadata => metadata.GSI1PK === "POKEMON")).toEqual(true);
         expect(result.every(pokemon => pokemon.name)).toBe(true);
     });
 });

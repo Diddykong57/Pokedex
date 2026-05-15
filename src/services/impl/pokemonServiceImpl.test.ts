@@ -4,11 +4,14 @@ import { PokemonRepository } from "../../repositories/pokemonRepository";
 
 describe("pokemonService", () => {
     it("should build pokemon then call pokemonRepository.create", async () => {
+        const createMock = jest.fn().mockResolvedValue(undefined);
+
         // create fake repo (= mock)
         const pokemonRepository = {
-            create: jest.fn().mockResolvedValue(undefined),
-            getPokemonDetailsByName: jest.fn(undefined),
+            create: createMock,
+            getPokemonDetailsByName: jest.fn(),
         } as unknown as PokemonRepository;
+
         const service = new PokemonServiceImpl(pokemonRepository);
 
         const data: CreatePokemonRequestDto = {
@@ -25,9 +28,9 @@ describe("pokemonService", () => {
 
         await service.createPokemon(data);
 
-        expect(pokemonRepository.create).toHaveBeenCalledTimes(1);
+        expect(createMock).toHaveBeenCalledTimes(1);
 
-        const pokemonSent = pokemonRepository.create.mock.calls[0][0];
+        const pokemonSent = createMock.mock.calls[0][0];
 
         expect(pokemonSent.id).toEqual(expect.any(String));
         expect(pokemonSent.createdAt).toEqual(expect.any(String));
