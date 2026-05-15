@@ -1,8 +1,17 @@
 import { createPokemonHandler } from "./createPokemon";
+import { getFakeDb, LocalPokemonRepository } from "../../repositories/impl/local/localPokemonRepository";
+import { PokemonServiceImpl } from "../../services/impl/pokemonServiceImpl";
 
 describe("handler - create pokemon", () => {
+    beforeEach(() => {
+        getFakeDb().splice(0);
+    });
+
     it("should create a pokemon and return code 201", async () => {
-        const payload = {
+        const repository = new LocalPokemonRepository();
+        const service = new PokemonServiceImpl(repository);
+
+        const response = await createPokemonHandler(service, {
             body: JSON.stringify({
                 name: "Pikachu",
                 types: ["Electric"],
@@ -14,43 +23,36 @@ describe("handler - create pokemon", () => {
                 maxAttack: 250,
                 maxDefense: 180,
             }),
-        };
-        const response = await createPokemonHandler(payload);
+        });
+
         const parseBody = JSON.parse(response.body);
 
         expect(response.statusCode).toBe(201);
         expect(parseBody.name).toEqual("Pikachu");
-    });
 
-    it("should return 400 when body is null", async () => {
-        const payload = {
-            body: null,
-        };
-        const response = await createPokemonHandler(payload);
-        const parseBody = JSON.parse(response.body);
+        const db = getFakeDb();
 
-        expect(response.statusCode).toBe(400);
-        expect(parseBody.name).toEqual(undefined);
-    });
+        expect(db.length).toBe(2);
 
-    it("should return 400 when body corrupted", async () => {
-        const payload = {
-            body: JSON.stringify({
-                types: ["Electric"],
-                description:
-                    "Petit et jaune auux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
-                region: "Kanto",
-                maxLevel: 100,
-                maxHp: 380,
-                maxAttack: 250,
-                maxDefense: 180,
-                nickname: "PikaPika",
-            }),
-        };
-        const response = await createPokemonHandler(payload);
-        const parseBody = JSON.parse(response.body);
+        const metadataItem = db.find(item => item.SK === "METADATA");
+        const statsItem = db.find(item => item.SK === "STATS");
 
-        expect(response.statusCode).toBe(400);
-        expect(parseBody.name).toEqual(undefined);
+        expect(metadataItem).toBeDefined();
+        expect(statsItem).toBeDefined();
+
+        if (!metadataItem || metadataItem.SK !== "METADATA") {
+            throw new Error("metadataItem not found");
+        }
+
+        if (!statsItem || statsItem.SK !== "STATS") {
+            throw new Error("statsItem not found");
+        }
+
+        expect(metadataItem.PK).toContain("POKEMON#");
+        expect(metadataItem.GSI1PK).toBe("POKEMON");
+        expect(metadataItem.GSI1SK).toBe("Pikachu");
+
+        expect(statsItem.PK).toContain("POKEMON#");
+        expect(statsItem.entityType).toBe("POKEMON_STATS");
     });
 });

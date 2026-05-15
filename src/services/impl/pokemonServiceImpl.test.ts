@@ -1,12 +1,14 @@
 import type { CreatePokemonRequestDto } from "../../dto/pokemon/createPokemonRequest.dto";
 import { PokemonServiceImpl } from "./pokemonServiceImpl";
+import { PokemonRepository } from "../../repositories/pokemonRepository";
 
 describe("pokemonService", () => {
     it("should build pokemon then call pokemonRepository.create", async () => {
         // create fake repo (= mock)
         const pokemonRepository = {
             create: jest.fn().mockResolvedValue(undefined),
-        };
+            getPokemonDetailsByName: jest.fn(undefined),
+        } as unknown as PokemonRepository;
         const service = new PokemonServiceImpl(pokemonRepository);
 
         const data: CreatePokemonRequestDto = {

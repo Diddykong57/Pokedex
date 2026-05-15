@@ -1,9 +1,17 @@
 import { createPokemonHandler } from "../../handlers/pokemon/createPokemon";
-import { getFakeDb } from "../../repositories/impl/local/localPokemonRepository";
+import { getFakeDb, LocalPokemonRepository } from "../../repositories/impl/local/localPokemonRepository";
+import { PokemonServiceImpl } from "../../services/impl/pokemonServiceImpl";
 
 describe("createPokemon", () => {
+    beforeEach(() => {
+        getFakeDb().splice(0);
+    });
+
     it("should create a pokemon and store it", async () => {
-        const response = await createPokemonHandler({
+        const repository = new LocalPokemonRepository();
+        const service = new PokemonServiceImpl(repository);
+
+        const response = await createPokemonHandler(service, {
             body: JSON.stringify({
                 name: "Pikachu",
                 types: ["Electric"],
