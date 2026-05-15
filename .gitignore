@@ -4,3 +4,4 @@ dist
 models-dynamoDB
 coverage
 .aws-sam
+.idea
