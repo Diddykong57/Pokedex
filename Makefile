@@ -8,7 +8,7 @@
 # =============================================================================
 
 env         ?= dev
-region      ?= eu-west-1
+region      ?= eu-west-3
 logLevel    ?= debug
 
 pkg-name        = $(shell node -p "require('./package.json').name")
@@ -47,7 +47,15 @@ include mk/plumbing.mk
 # -----------------------------------------------------------------------------
 # Targets principales
 # -----------------------------------------------------------------------------
-.PHONY: all build package deploy clean clean-stack
+.PHONY: all build package deploy clean clean-stack init debug
+
+
+init:
+	aws cloudformation deploy \
+		--region $(region) \
+		--stack-name $(initStackName) \
+		--template-file sam/init.yml \
+		--capabilities CAPABILITY_NAMED_IAM
 
 all: clean build package deploy
 
@@ -68,16 +76,32 @@ deploy: template-output.yml $(initStackName).outputs
 		--role-arn $(cloudformationRole) \
 		--tags \
 			novatraqr:cloudformation:stack-name=$(stackName) \
-			novatraqr:git:commit=$(gitCommit) \
-			novatraqr:git:version=$(gitVersion) \
-			novatraqr:git:source=$(gitRepoName) \
 		--parameter-overrides \
 			ServiceName=$(pkg-name) \
 			Environment=$(env) \
 			StackSuffix=$(stackNameSuffix) \
-			LoggerLevel=$(logLevel) \
-			CreateEventBus=$(createEventBus) \
-			EventBusName=$(eventBusName)
+			LoggerLevel=$(logLevel)
+
+#deployBKP: template-output.yml $(initStackName).outputs
+#	sam deploy \
+#		--region $(region) \
+#		--template-file template-output.yml \
+#		--no-fail-on-empty-changeset \
+#		--stack-name $(stackName) \
+#		--capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
+#		--role-arn $(cloudformationRole) \
+#		--tags \
+#			novatraqr:cloudformation:stack-name=$(stackName) \
+#			novatraqr:git:commit=$(gitCommit) \
+#			novatraqr:git:version=$(gitVersion) \
+#			novatraqr:git:source=$(gitRepoName) \
+#		--parameter-overrides \
+#			ServiceName=$(pkg-name) \
+#			Environment=$(env) \
+#			StackSuffix=$(stackNameSuffix) \
+#			LoggerLevel=$(logLevel) \
+#			CreateEventBus=$(createEventBus) \
+#			EventBusName=$(eventBusName)
 
 clean-stack:
 	aws cloudformation delete-stack --region $(region) --stack-name $(stackName)
@@ -87,3 +111,9 @@ clean:
 	-@rm -f *.outputs
 	-@rm -f template-output.yml
 	-@rm -rf node_modules dist
+	-@rm -rf layers/shared/nodejs/node_modules
+
+debug:
+	aws cloudformation describe-stack-events \
+	  --region $(region) \
+	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-ApiApp-1H4DW4691JY7V/f5d35e10-552f-11f1-89c7-0ad626a8e519

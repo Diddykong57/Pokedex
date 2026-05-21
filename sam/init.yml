@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  TemplateBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "pokedex-sam-artifacts-${AWS::AccountId}-${AWS::Region}"
+
+  CloudformationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "pokedex-cloudformation-role-${AWS::Region}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+Outputs:
+  TemplateBucket:
+    Description: Template Bucket
+    Value: !Ref TemplateBucket
+
+  CloudformationRole:
+    Description: CloudFormation deployment role ARN
+    Value: !GetAtt CloudformationRole.Arn
