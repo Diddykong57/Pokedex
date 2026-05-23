@@ -14,10 +14,10 @@ describe("toPokemonItems", () => {
             description:
                 "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
             region: "Kanto",
-            maxLevel: 100,
-            maxHp: 380,
-            maxAttack: 250,
-            maxDefense: 180,
+            level: 100,
+            hp: 380,
+            attack: 250,
+            defense: 180,
             createdAt: now,
         };
 
@@ -43,10 +43,10 @@ describe("toPokemonItems", () => {
         expect(statsItem.PK).toContain("POKEMON#");
         expect(statsItem.SK).toBe("STATS");
         expect(statsItem.entityType).toBe("POKEMON_STATS");
-        expect(statsItem.maxLevel).toBe(100);
-        expect(statsItem.maxHp).toBe(380);
-        expect(statsItem.maxAttack).toBe(250);
-        expect(statsItem.maxDefense).toBe(180);
+        expect(statsItem.level).toBe(100);
+        expect(statsItem.hp).toBe(380);
+        expect(statsItem.attack).toBe(250);
+        expect(statsItem.defense).toBe(180);
     });
 });
 

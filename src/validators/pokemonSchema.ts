@@ -5,10 +5,10 @@ const pokemonFields = {
     types: Joi.array().items(Joi.string().min(3).max(20)).min(1),
     description: Joi.string().min(10).max(500),
     region: Joi.string().min(2).max(50),
-    maxLevel: Joi.number().integer().min(80).max(120),
-    maxHp: Joi.number().integer().min(1),
-    maxAttack: Joi.number().integer().min(1),
-    maxDefense: Joi.number().integer().min(1),
+    level: Joi.number().integer().min(80).max(120),
+    hp: Joi.number().integer().min(1),
+    attack: Joi.number().integer().min(1),
+    defense: Joi.number().integer().min(1),
 };
 
 export const createPokemonSchema = Joi.object({
@@ -16,10 +16,10 @@ export const createPokemonSchema = Joi.object({
     types: pokemonFields.types.required(),
     description: pokemonFields.description.required(),
     region: pokemonFields.region.required(),
-    maxLevel: pokemonFields.maxLevel.required(),
-    maxHp: pokemonFields.maxHp.required(),
-    maxAttack: pokemonFields.maxAttack.required(),
-    maxDefense: pokemonFields.maxDefense.required(),
+    level: pokemonFields.level.required(),
+    hp: pokemonFields.hp.required(),
+    attack: pokemonFields.attack.required(),
+    defense: pokemonFields.defense.required(),
 }).required();
 
 export const updatePokemonSchema = Joi.object({
@@ -27,8 +27,8 @@ export const updatePokemonSchema = Joi.object({
     types: pokemonFields.types.optional(),
     description: pokemonFields.description.optional(),
     region: pokemonFields.region.optional(),
-    maxLevel: pokemonFields.maxLevel.optional(),
-    maxHp: pokemonFields.maxHp.optional(),
-    maxAttack: pokemonFields.maxAttack.optional(),
-    maxDefense: pokemonFields.maxDefense.optional(),
+    level: pokemonFields.level.optional(),
+    hp: pokemonFields.hp.optional(),
+    attack: pokemonFields.attack.optional(),
+    defense: pokemonFields.defense.optional(),
 }).required();

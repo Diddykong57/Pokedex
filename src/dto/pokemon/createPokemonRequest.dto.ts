@@ -3,8 +3,8 @@ export interface CreatePokemonRequestDto {
     types: string[];
     description: string;
     region: string;
-    maxLevel: number;
-    maxHp: number;
-    maxAttack: number;
-    maxDefense: number;
+    level: number;
+    hp: number;
+    attack: number;
+    defense: number;
 }

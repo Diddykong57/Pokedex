@@ -15,10 +15,10 @@ export interface PokemonMetadataItem extends BaseItem {
 export interface PokemonStatsItem extends BaseItem {
     SK: "STATS";
     entityType: "POKEMON_STATS";
-    maxLevel: number;
-    maxHp: number;
-    maxAttack: number;
-    maxDefense: number;
+    level: number;
+    hp: number;
+    attack: number;
+    defense: number;
     createdAt: string;
 }
 

@@ -18,10 +18,10 @@ describe("createPokemon", () => {
                 description:
                     "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
                 region: "Kanto",
-                maxLevel: 100,
-                maxHp: 380,
-                maxAttack: 250,
-                maxDefense: 180,
+                level: 100,
+                hp: 380,
+                attack: 250,
+                defense: 180,
             }),
         });
 

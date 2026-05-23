@@ -27,10 +27,10 @@ export class PokemonServiceImpl implements PokemonService {
             types: data.types,
             description: data.description,
             region: data.region,
-            maxLevel: data.maxLevel,
-            maxHp: data.maxHp,
-            maxAttack: data.maxAttack,
-            maxDefense: data.maxDefense,
+            level: data.level,
+            hp: data.hp,
+            attack: data.attack,
+            defense: data.defense,
             createdAt: now,
         };
         await this.pokemonRepository.create(pokemon);
