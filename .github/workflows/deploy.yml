@@ -10,7 +10,7 @@ on:
 
 env:
   CI: true
-  env: ${{ vars.ENV || inputs.environment }}
+  env: ${{ inputs.environment }}
   PYTHON_VERSION: ${{ vars.PYTHON_VERSION }}
   SAM_VERSION: ${{ vars.SAM_VERSION }}
   AWS_REGION: eu-west-3
@@ -50,8 +50,8 @@ jobs:
       - name: Configure AWS Credentials (NON CORE)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets[format('AWS_CF_{0}_ACCESS_KEY', inputs.environment)] }}
-          aws-secret-access-key: ${{ secrets[format('AWS_CF_{0}_SECRET_KEY', inputs.environment)] }}
+          aws-access-key-id: ${{ secrets[format('AWS_CF_{0}_ACCESS_KEY', vars.ENV)] }}
+          aws-secret-access-key: ${{ secrets[format('AWS_CF_{0}_SECRET_KEY', vars.ENV)] }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Webpack build
