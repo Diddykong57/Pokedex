@@ -10,27 +10,37 @@ import type { PokemonRepository } from "./repositories/pokemonRepository";
 import { DynamoPokemonRepository } from "./repositories/impl/dynamoDB/dynamoPokemonRepository";
 import type { PokemonService } from "./services/pokemonService";
 import { PokemonServiceImpl } from "./services/impl/pokemonServiceImpl";
+import { UserRepository } from "./repositories/userRepository";
+import { getFakeUserDb, LocalUserRepository } from "./repositories/impl/local/localUserRepository";
+import { UserService } from "./services/userService";
+import { UserServiceImpl } from "./services/impl/userServiceImpl";
+import { createUserHandler } from "./handlers/user/createUser";
+import { userCreateFixture } from "./tests/fixtures/user";
 
-const repository: PokemonRepository =
+const pokemonRepository: PokemonRepository =
     process.env.APP_ENV === "aws" ? new DynamoPokemonRepository() : new LocalPokemonRepository();
-const service: PokemonService = new PokemonServiceImpl(repository);
+const pokemonService: PokemonService = new PokemonServiceImpl(pokemonRepository);
+
+const userRepository: UserRepository = new LocalUserRepository();
+    // process.env.APP_ENV === "aws" ? new DynamoUserRepository() : new LocalUserRepository();
+const userService: UserService = new UserServiceImpl(userRepository);
 
 async function main() {
     let response: ApiResponse;
-    response = await createPokemonHandler(service, { body: JSON.stringify(pokemonCreateFixture[0]) });
+    response = await createPokemonHandler(pokemonService, { body: JSON.stringify(pokemonCreateFixture[0]) });
 
-    console.log("[getPokemonListHandler[0]] HTTP response:");
+    console.log("[createPokemonListHandler[0]] HTTP response:");
     console.log(response);
 
-    await createPokemonHandler(service, { body: JSON.stringify(pokemonCreateFixture[1]) });
-    await createPokemonHandler(service, { body: JSON.stringify(pokemonCreateFixture[2]) });
-    await createPokemonHandler(service, { body: JSON.stringify(pokemonCreateFixture[3]) });
-    response = await createPokemonHandler(service, { body: JSON.stringify(pokemonCreateFixture[0]) });
+    await createPokemonHandler(pokemonService, { body: JSON.stringify(pokemonCreateFixture[1]) });
+    await createPokemonHandler(pokemonService, { body: JSON.stringify(pokemonCreateFixture[2]) });
+    await createPokemonHandler(pokemonService, { body: JSON.stringify(pokemonCreateFixture[3]) });
+    response = await createPokemonHandler(pokemonService, { body: JSON.stringify(pokemonCreateFixture[0]) });
 
     console.log("[getPokemonListHandler[4]] HTTP response:");
     console.log(response);
 
-    response = await getPokemonListHandler(service);
+    response = await getPokemonListHandler(pokemonService);
 
     console.log("[getPokemonListHandler] HTTP response:");
     console.log(response);
@@ -38,12 +48,12 @@ async function main() {
     const parsedBody = JSON.parse(response.body);
     const id = parsedBody[0].id;
 
-    response = await getPokemonDetailsHandler(service, { pathParameters: { id } });
+    response = await getPokemonDetailsHandler(pokemonService, { pathParameters: { id } });
 
     console.log("[getPokemonDetailsHandler] HTTP response:");
     console.log(response);
 
-    response = await updatePokemonHandler(service, {
+    response = await updatePokemonHandler(pokemonService, {
         pathParameters: {
             id,
         },
@@ -53,18 +63,32 @@ async function main() {
     console.log("[updatePokemonHandler] HTTP response:");
     console.log(response);
 
-    response = await deletePokemonHandler(service, { pathParameters: { id } });
+    response = await deletePokemonHandler(pokemonService, { pathParameters: { id } });
 
     console.log("[deletePokemonHandler] HTTP response:");
     console.log(response);
 
-    response = await getPokemonListHandler(service);
+    response = await getPokemonListHandler(pokemonService);
 
     console.log("[getPokemonListHandler] HTTP response:");
     console.log(response);
 
     // console.log("Fake DB content:");
     // console.dir(getFakeDb(), { depth: null });
+
+    console.log(" -----------------");
+    console.log(" --- User part ---");
+    console.log(" -----------------");
+    response = await createUserHandler(userService, { body: JSON.stringify(userCreateFixture[0]) });
+
+    console.log("[createUserHandler[0]] HTTP response:");
+    console.log(response);
+
+    await createUserHandler(userService, { body: JSON.stringify(userCreateFixture[1]) });
+    await createUserHandler(userService, { body: JSON.stringify(userCreateFixture[2]) });
+
+    console.log("Fake DB content:");
+    console.dir(getFakeUserDb(), { depth: null });
 }
 
 main();
