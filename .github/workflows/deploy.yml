@@ -1,0 +1,69 @@
+name: Deploy
+run-name: Deploy / ${{ inputs.environment }} / ${{ github.ref_name }}
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+env:
+  CI: true
+  env: ${{ vars.ENV || inputs.environment }}
+  PYTHON_VERSION: ${{ vars.PYTHON_VERSION }}
+  SAM_VERSION: ${{ vars.SAM_VERSION }}
+  AWS_REGION: eu-west-3
+  SAM_CLI_TELEMETRY: 0
+  SAM_CLI_POLL_DELAY: 10
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment: ${{ inputs.environment }}
+
+    concurrency:
+      group: ${{ inputs.environment }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install AWS SAM CLI ${{ env.SAM_VERSION }}
+        uses: aws-actions/setup-sam@v2
+        with:
+          version: ${{ env.SAM_VERSION }}
+
+      - name: Configure AWS Credentials (NON CORE)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets[format('AWS_CF_{0}_ACCESS_KEY', inputs.environment)] }}
+          aws-secret-access-key: ${{ secrets[format('AWS_CF_{0}_SECRET_KEY', inputs.environment)] }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Webpack build
+        run: make build
+
+      - name: Package CloudFormation
+        run: make package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ inputs.environment }}
+          path: template-output.yml
+
+      - name: Deploy CloudFormation
+        run: make deploy
