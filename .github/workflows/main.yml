@@ -3,7 +3,6 @@ name: Main deployment
 on:
   push:
     branches:
-      - features/deployment
       - main
 
 jobs:
