@@ -3,12 +3,13 @@ import { badRequestError } from "../../utils/errorUtils";
 import { ERROR_MESSAGES } from "../../global/constants/errorMessages";
 import { validateSchema } from "../../validators/schemaValidator";
 import { HTTP } from "../../global/constants/httpStatus";
-import { ApiRequest, ApiResponse } from "../../global/types/api";
+import { ApiResponse } from "../../global/types/api";
 import { createUserSchema } from "../../validators/userSchema";
 import { UserService } from "../../services/userService";
 import { toUserResponseDto } from "../../mappers/userMapper";
+import { APIGatewayProxyEvent } from "aws-lambda";
 
-export const createUserHandler = async (service: UserService, event: ApiRequest): Promise<ApiResponse> => {
+export const createUserHandler = async (service: UserService, event: APIGatewayProxyEvent): Promise<ApiResponse> => {
     return handleRequest(async () => {
         if (!event.body) {
             throw badRequestError(ERROR_MESSAGES.MISSING_BODY);

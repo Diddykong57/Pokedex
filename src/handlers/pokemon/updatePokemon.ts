@@ -1,13 +1,14 @@
 import type { PokemonService } from "../../services/pokemonService";
-import type { ApiRequest, ApiResponse } from "../../global/types/api";
+import type { ApiResponse } from "../../global/types/api";
 import { handleRequest } from "../utils/handleRequest";
 import { toPokemonResponseDto } from "../../mappers/pokemonMapper";
 import { badRequestError } from "../../utils/errorUtils";
 import { ERROR_MESSAGES } from "../../global/constants/errorMessages";
 import { validateSchema } from "../../validators/schemaValidator";
 import { updatePokemonSchema } from "../../validators/pokemonSchema";
+import { APIGatewayProxyEvent } from "aws-lambda";
 
-export const updatePokemonHandler = async (service: PokemonService, event: ApiRequest): Promise<ApiResponse> => {
+export const updatePokemonHandler = async (service: PokemonService, event: APIGatewayProxyEvent): Promise<ApiResponse> => {
     return handleRequest(async () => {
         if (!event.body) {
             throw badRequestError(ERROR_MESSAGES.MISSING_BODY);

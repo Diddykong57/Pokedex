@@ -4,7 +4,7 @@ import { getPokemonListHandler } from "./handlers/pokemon/getPokemonList";
 import { getPokemonDetailsHandler } from "./handlers/pokemon/getPokemonDetails";
 import { updatePokemonHandler } from "./handlers/pokemon/updatePokemon";
 import { pokemonCreateFixture, pokemonUpdateFixture } from "./tests/fixtures/pokemon";
-import type { ApiRequest, ApiResponse } from "./global/types/api";
+import type { ApiResponse } from "./global/types/api";
 import { deletePokemonHandler } from "./handlers/pokemon/deletePokemon";
 import type { PokemonRepository } from "./repositories/pokemonRepository";
 import { DynamoPokemonRepository } from "./repositories/impl/dynamoDB/dynamoPokemonRepository";
