@@ -47,7 +47,7 @@ include mk/plumbing.mk
 # -----------------------------------------------------------------------------
 # Targets principales
 # -----------------------------------------------------------------------------
-.PHONY: all build package deploy clean clean-stack init debug
+.PHONY: all build package deploy clean clean-stack init debug test
 
 
 init:
@@ -116,4 +116,7 @@ clean:
 debug:
 	aws cloudformation describe-stack-events \
 	  --region $(region) \
-	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-ApiApp-1H4DW4691JY7V/f5d35e10-552f-11f1-89c7-0ad626a8e519
+	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-ApiApp-1C8JP1JQEU4MQ/5c29ae70-5531-11f1-80c1-0a36288d01b9
+
+
+test: clean build package

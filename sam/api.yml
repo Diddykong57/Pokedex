@@ -20,6 +20,9 @@ Parameters:
     Description: "the event bus used to put message and read messages. used to test the domain without interferences with others"
     Type: String
     Default: default
+  UserPoolId:
+    Description: User Pool ID
+    Type: String
   UserPoolArn:
     Description: User Pool ARN
     Type: String
@@ -102,6 +105,7 @@ Resources:
   # Main Lambda handling all Pokemon routes
   PokedexFunction:
     Type: AWS::Serverless::Function
+
     Properties:
       CodeUri: ../dist
       Handler: handlers/pokemon/index.handler
@@ -166,6 +170,40 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
+
+  # Admin lambda to manage users
+  AdminUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../dist
+      Handler: handlers/user/createUser.createUserHandler
+
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          USER_POOL_ID: !Ref UserPoolId
+
+      # IAM permissions automatically generated for DynamoDB CRUD
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableName
+        - Statement:
+          - Effect: Allow
+            Action:
+              - cognito-idp:AdminCreateUser
+              - cognito-idp:AdminAddUserToGroup
+              - cognito-idp:AdminGetUser
+            Resource: !Ref UserPoolArn
+
+      Events:
+        UserCreate:
+          Type: Api
+          Properties:
+            RestApiId: !Ref PokedexApi
+            Path: /admin/users
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
 
 Outputs:
   ApiId:

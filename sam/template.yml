@@ -85,6 +85,7 @@ Resources:
         Layer: !Ref NodeModulesLayer
         LoggerLevel: !Ref LoggerLevel
         EventBusName: !If [IsCustomEventBus, !Ref EventBus, default]
+        UserPoolId: !GetAtt AuthApp.Outputs.UserPoolId
         UserPoolArn: !GetAtt AuthApp.Outputs.UserPoolArn
         TableName: !GetAtt DynamoApp.Outputs.TableName
 
