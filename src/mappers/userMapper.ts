@@ -18,7 +18,7 @@ export const toUserItems = (user: User): UserProfileItem => {
 }
 
 export const toUserFromProfileItem = (item: UserProfileItem): User => ({
-    id: item.PK.replace(`${USER_ITEM.PK_PREFIX}#`, ""),
+    id: item.userId,
     email: item.email,
     nickname: item.nickname,
     createdAt: item.createdAt
@@ -32,7 +32,7 @@ export const toUserResponseDto = (user: User): UserResponseDto => ({
 })
 
 export const toUserDetails = (profile: UserProfileItem): User => ({
-    id: profile.PK.replace(`${USER_ITEM.PK_PREFIX}`, ""),
+    id: profile.userId,
     email: profile.email,
     nickname: profile.nickname,
     createdAt: profile.createdAt,

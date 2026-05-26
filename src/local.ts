@@ -117,7 +117,7 @@ async function main() {
 
     response = await pokemonMainHandler(
         buildApiEvent({
-            httpMethod: "PUT",
+            httpMethod: "DELETE",
             pathParameters: {
                 id: pokemonId
             },
@@ -185,6 +185,29 @@ async function main() {
         })
     );
     console.log("[getUserDetailsHandler] HTTP response:");
+    console.log(response);
+
+
+    // User create User
+    console.log("************************");
+    console.log("*** User create User ***");
+    console.log("************************");
+    response = await userMainHandler(
+        buildApiEvent({
+            httpMethod: "POST",
+            requestContext: {
+                authorizer: {
+                    claims: {
+                        sub: body.id,
+                        email: body.email,
+                        "cognito:groups": "",
+                    }
+                }
+            },
+            body: JSON.stringify(userCreateFixture[0]),
+        })
+    );
+    console.log("[createUserHandler[0]] HTTP response:");
     console.log(response);
 }
 

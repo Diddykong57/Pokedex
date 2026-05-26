@@ -43,7 +43,7 @@ export const pokemonMainHandler = async (event: APIGatewayProxyEvent) => {
             return handleRequest( async () => {
                 const auth = getAuthContext(event);
                 return deletePokemonHandler(service, auth.userId, event);
-            })
+            }, HTTP.NO_CONTENT)
 
         default:
             return handleRequest(async () => {
