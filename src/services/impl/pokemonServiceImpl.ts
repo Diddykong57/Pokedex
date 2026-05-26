@@ -11,8 +11,8 @@ import type { PokemonResponseDto } from "../../dto/pokemon/pokemonResponse.dto";
 export class PokemonServiceImpl implements PokemonService {
     constructor(private readonly pokemonRepository: PokemonRepository) {}
 
-    async createPokemon(data: CreatePokemonRequestDto): Promise<PokemonResponseDto> {
-        const existingPokemon = await this.pokemonRepository.getPokemonDetailsByName(data.name);
+    async createPokemon(userId: string, data: CreatePokemonRequestDto): Promise<PokemonResponseDto> {
+        const existingPokemon = await this.pokemonRepository.getPokemonDetailsByName(userId, data.name);
 
         if (existingPokemon) {
             throw conflictError();
@@ -33,20 +33,20 @@ export class PokemonServiceImpl implements PokemonService {
             defense: data.defense,
             createdAt: now,
         };
-        await this.pokemonRepository.create(pokemon);
+        await this.pokemonRepository.create(userId, pokemon);
         return pokemon;
     }
 
-    async getPokemonList(): Promise<PokemonListItem[]> {
-        return this.pokemonRepository.getPokemonList();
+    async getPokemonList(userId: string): Promise<PokemonListItem[]> {
+        return this.pokemonRepository.getPokemonList(userId);
     }
 
-    async getPokemonDetails(id: string): Promise<PokemonResponseDto> {
-        return this.pokemonRepository.getPokemonDetails(id);
+    async getPokemonDetails(userId: string, pokemonId:string): Promise<PokemonResponseDto> {
+        return this.pokemonRepository.getPokemonDetails(userId, pokemonId);
     }
 
-    async updatePokemon(id: string, data: UpdatePokemonRequestDto): Promise<PokemonResponseDto> {
-        const existingPokemon = await this.getPokemonDetails(id);
+    async updatePokemon(userId: string, pokemonId: string, data: UpdatePokemonRequestDto): Promise<PokemonResponseDto> {
+        const existingPokemon = await this.getPokemonDetails(userId, pokemonId);
 
         const { name, ...updatableFields } = data;
 
@@ -55,12 +55,12 @@ export class PokemonServiceImpl implements PokemonService {
             ...updatableFields,
         };
 
-        await this.pokemonRepository.updatePokemon(updatedPokemon);
+        await this.pokemonRepository.updatePokemon(userId, updatedPokemon);
 
         return updatedPokemon;
     }
 
-    async deletePokemon(pk: string): Promise<void> {
-        await this.pokemonRepository.deletePokemon(pk);
+    async deletePokemon(userId: string, pokemonId: string): Promise<void> {
+        await this.pokemonRepository.deletePokemon(userId, pokemonId);
     }
 }

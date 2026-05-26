@@ -1,10 +1,11 @@
 import type { BaseItem } from "./baseItem";
 
 export interface PokemonMetadataItem extends BaseItem {
-    SK: "METADATA";
     GSI1PK: "POKEMON";
     GSI1SK: string;
-    entityType: "POKEMON_METADATA";
+    entityType: "USER_POKEMON_METADATA";
+    userId: string,
+    pokemonId: string,
     name: string;
     types: string[];
     description: string;
@@ -13,8 +14,9 @@ export interface PokemonMetadataItem extends BaseItem {
 }
 
 export interface PokemonStatsItem extends BaseItem {
-    SK: "STATS";
-    entityType: "POKEMON_STATS";
+    entityType: "USER_POKEMON_STATS";
+    userId: string,
+    pokemonId: string,
     level: number;
     hp: number;
     attack: number;

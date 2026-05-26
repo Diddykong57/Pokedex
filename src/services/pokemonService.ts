@@ -4,9 +4,9 @@ import type { PokemonResponseDto } from "../dto/pokemon/pokemonResponse.dto";
 import { PokemonListItem } from "../models/pokemon";
 
 export interface PokemonService {
-    createPokemon(data: CreatePokemonRequestDto): Promise<PokemonResponseDto>;
-    getPokemonList(): Promise<PokemonListItem[]>;
-    getPokemonDetails(id: string): Promise<PokemonResponseDto>;
-    updatePokemon(id: string, data: UpdatePokemonRequestDto): Promise<PokemonResponseDto>;
-    deletePokemon(id: string): Promise<void>;
+    createPokemon(userId: string, data: CreatePokemonRequestDto): Promise<PokemonResponseDto>;
+    getPokemonList(userId: string): Promise<PokemonListItem[]>;
+    getPokemonDetails(userId: string, pokemonId: string): Promise<PokemonResponseDto>;
+    updatePokemon(userId: string, pokemonId: string, data: UpdatePokemonRequestDto): Promise<PokemonResponseDto>;
+    deletePokemon(userId: string, id: string): Promise<void>;
 }

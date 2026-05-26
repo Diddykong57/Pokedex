@@ -2,17 +2,20 @@ import { Pokemon, PokemonListItem } from "../models/pokemon";
 import type { PokemonMetadataItem, PokemonStatsItem } from "../repositories/types/pokemonItem";
 import type { PokemonListResponseDto, PokemonResponseDto } from "../dto/pokemon/pokemonResponse.dto";
 import { POKEMON_ITEM } from "../global/constants/pokemon";
+import { USER_ITEM } from "../global/constants/user";
 
-export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonStatsItem] => {
-    const pk = `${POKEMON_ITEM.PK_PREFIX}#${pokemon.id}`;
+export const toPokemonItems = (userId: string, pokemon: Pokemon): [PokemonMetadataItem, PokemonStatsItem] => {
+    const pk = `${USER_ITEM.PK_PREFIX}#${userId}`;
 
     return [
         {
             PK: pk,
-            SK: POKEMON_ITEM.METADATA.SK,
+            SK: `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}#${pokemon.id}`,
             GSI1PK: POKEMON_ITEM.METADATA.GSI1PK,
             GSI1SK: pokemon.name,
             entityType: POKEMON_ITEM.METADATA.ENTITY_TYPE,
+            userId: userId,
+            pokemonId: pokemon.id,
             name: pokemon.name,
             types: pokemon.types,
             description: pokemon.description,
@@ -21,8 +24,10 @@ export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonS
         },
         {
             PK: pk,
-            SK: POKEMON_ITEM.STATS.SK,
+            SK: `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.STATS.SK}#${pokemon.id}`,
             entityType: POKEMON_ITEM.STATS.ENTITY_TYPE,
+            userId: userId,
+            pokemonId: pokemon.id,
             level: pokemon.level,
             hp: pokemon.hp,
             attack: pokemon.attack,
@@ -33,7 +38,7 @@ export const toPokemonItems = (pokemon: Pokemon): [PokemonMetadataItem, PokemonS
 };
 
 export const toPokemonFromMetadataItem = (item: PokemonMetadataItem): PokemonListItem => ({
-    id: item.PK.replace(`${POKEMON_ITEM.PK_PREFIX}#`, ""),
+    id: item.pokemonId,
     name: item.name,
     types: item.types,
     description: item.description,
@@ -42,7 +47,7 @@ export const toPokemonFromMetadataItem = (item: PokemonMetadataItem): PokemonLis
 });
 
 export const toPokemonDetails = (metadataItem: PokemonMetadataItem, statsItem: PokemonStatsItem): Pokemon => ({
-    id: metadataItem.PK.replace(`${POKEMON_ITEM.PK_PREFIX}#`, ""),
+    id: metadataItem.pokemonId,
     name: metadataItem.name,
     types: metadataItem.types,
     description: metadataItem.description,

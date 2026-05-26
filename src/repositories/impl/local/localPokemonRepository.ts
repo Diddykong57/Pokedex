@@ -5,42 +5,45 @@ import type { PokemonItem, PokemonMetadataItem, PokemonStatsItem } from "../../t
 import { POKEMON_ITEM } from "../../../global/constants/pokemon";
 import { notFoundError } from "../../../utils/errorUtils";
 import { ERROR_MESSAGES } from "../../../global/constants/errorMessages";
+import { USER_ITEM } from "../../../global/constants/user";
 
-const fakeDb: PokemonItem[] = [];
+const fakePokemonDb: PokemonItem[] = [];
 
 export class LocalPokemonRepository implements PokemonRepository {
     // async is not required here, but kept for interface consistency
-    async create(pokemon: Pokemon): Promise<void> {
-        const [metadataItem, statsItem] = toPokemonItems(pokemon);
+    async create(userId: string, pokemon: Pokemon): Promise<void> {
+        const [metadataItem, statsItem] = toPokemonItems(userId, pokemon);
 
-        fakeDb.push(metadataItem);
-        fakeDb.push(statsItem);
+        fakePokemonDb.push(metadataItem);
+        fakePokemonDb.push(statsItem);
     }
 
-    async getPokemonList(): Promise<PokemonListItem[]> {
-        const pokemonList = fakeDb.filter(
-            item => item.SK === POKEMON_ITEM.METADATA.SK && item.GSI1PK === POKEMON_ITEM.METADATA.GSI1PK
+    async getPokemonList(userId: string): Promise<PokemonListItem[]> {
+        const pk = `${USER_ITEM.PK_PREFIX}#${userId}`;
+        const pokemonList = fakePokemonDb.filter(
+            item =>
+                item.PK === pk &&
+                item.SK.startsWith(`${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}`)
         ) as PokemonMetadataItem[];
         return pokemonList.map(item => toPokemonFromMetadataItem(item));
     }
 
-    async getPokemonDetails(id: string): Promise<Pokemon> {
-        const pk = `${POKEMON_ITEM.PK_PREFIX}#${id}`;
+    async getPokemonDetails(userId:string, pokemonId:string): Promise<Pokemon> {
+        const pk = `${USER_ITEM.PK_PREFIX}#${userId}`;
+        const skMetadata = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}#${pokemonId}`;
+        const skStats = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.STATS.SK}#${pokemonId}`;
 
-        const metadata = await this.getMetadata(pk);
-        const stats = await this.getStats(pk);
-
-        if (!metadata || !stats) {
-            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
-        }
+        const metadata = await this.getMetadata(pk, skMetadata);
+        const stats = await this.getStats(pk, skStats);
 
         return toPokemonDetails(metadata, stats);
     }
 
-    async getPokemonDetailsByName(name: string): Promise<PokemonListItem | null> {
-        const metadata = fakeDb.find(
+    async getPokemonDetailsByName(userId: string, name: string): Promise<PokemonListItem | null> {
+        const pk = `${USER_ITEM.PK_PREFIX}#${userId}`;
+        const metadata = fakePokemonDb.find(
             (item): item is PokemonMetadataItem =>
-                item.SK === POKEMON_ITEM.METADATA.SK &&
+                item.PK === pk &&
                 item.GSI1PK === POKEMON_ITEM.METADATA.GSI1PK &&
                 item.name === name
         );
@@ -52,30 +55,27 @@ export class LocalPokemonRepository implements PokemonRepository {
         return toPokemonFromMetadataItem(metadata);
     }
 
-    async updatePokemon(pokemon: Pokemon): Promise<void> {
-        const [metadataItem, statsItem] = toPokemonItems(pokemon);
-        const pk = `${POKEMON_ITEM.PK_PREFIX}#${pokemon.id}`;
+    async updatePokemon(userId: string, pokemon: Pokemon): Promise<void> {
+        const metadataIndex = await this.getMetadataIndex(userId, pokemon.id);
+        const statsIndex = await this.getStatsIndex(userId, pokemon.id);
 
-        const metadataIndex = await this.getMetadataIndex(pk);
-        const statsIndex = await this.getStatsIndex(pk);
+        const [metadataItem, statsItem] = toPokemonItems(userId, pokemon);
 
-        fakeDb[metadataIndex] = metadataItem;
-        fakeDb[statsIndex] = statsItem;
+        fakePokemonDb[metadataIndex] = metadataItem;
+        fakePokemonDb[statsIndex] = statsItem;
     }
 
-    async deletePokemon(id: string): Promise<void> {
-        const pk = `${POKEMON_ITEM.PK_PREFIX}#${id}`;
+    async deletePokemon(userId: string, pokemonId: string): Promise<void> {
+        const metadataIndex = await this.getMetadataIndex(userId, pokemonId);
+        const statsIndex = await this.getStatsIndex(userId, pokemonId);
 
-        const metadataIndex = await this.getMetadataIndex(pk);
-        const statsIndex = await this.getStatsIndex(pk);
-
-        fakeDb.splice(metadataIndex, 1);
-        fakeDb.splice(statsIndex, 1);
+        fakePokemonDb.splice(metadataIndex, 1);
+        fakePokemonDb.splice(statsIndex, 1);
     }
 
-    private async getMetadata(pk: string): Promise<PokemonMetadataItem> {
-        const metadata = fakeDb.find(
-            (item): item is PokemonMetadataItem => item.PK === pk && item.SK === POKEMON_ITEM.METADATA.SK
+    private async getMetadata(pk: string, sk: string): Promise<PokemonMetadataItem> {
+        const metadata = fakePokemonDb.find(
+            (item): item is PokemonMetadataItem => item.PK === pk && item.SK === sk
         );
 
         if (!metadata) {
@@ -85,9 +85,9 @@ export class LocalPokemonRepository implements PokemonRepository {
         return metadata;
     }
 
-    private async getStats(pk: string): Promise<PokemonStatsItem> {
-        const stats = fakeDb.find(
-            (item): item is PokemonStatsItem => item.PK === pk && item.SK === POKEMON_ITEM.STATS.SK
+    private async getStats(pk: string, skStats: string): Promise<PokemonStatsItem> {
+        const stats = fakePokemonDb.find(
+            (item): item is PokemonStatsItem => item.PK === pk && item.SK === skStats
         );
 
         if (!stats) {
@@ -97,9 +97,11 @@ export class LocalPokemonRepository implements PokemonRepository {
         return stats;
     }
 
-    private async getMetadataIndex(pk: string): Promise<number> {
-        const index = fakeDb.findIndex(
-            (item): item is PokemonMetadataItem => item.PK === pk && item.SK === POKEMON_ITEM.METADATA.SK
+    private async getMetadataIndex(userId: string, pokemonId: string): Promise<number> {
+        const index = fakePokemonDb.findIndex(
+            (item): item is PokemonMetadataItem =>
+                item.PK === `${USER_ITEM.PK_PREFIX}#${userId}` &&
+                item.SK === `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}#${pokemonId}`
         );
 
         if (index === -1) {
@@ -109,9 +111,11 @@ export class LocalPokemonRepository implements PokemonRepository {
         return index;
     }
 
-    private async getStatsIndex(pk: string): Promise<number> {
-        const index = fakeDb.findIndex(
-            (item): item is PokemonStatsItem => item.PK === pk && item.SK === POKEMON_ITEM.STATS.SK
+    private async getStatsIndex(userId: string, pokemonId: string): Promise<number> {
+        const index = fakePokemonDb.findIndex(
+            (item): item is PokemonMetadataItem =>
+                item.PK === `${USER_ITEM.PK_PREFIX}#${userId}` &&
+                item.SK === `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.STATS.SK}#${pokemonId}`
         );
 
         if (!index) {
@@ -123,5 +127,5 @@ export class LocalPokemonRepository implements PokemonRepository {
 }
 
 export function getFakeDb() {
-    return fakeDb;
+    return fakePokemonDb;
 }

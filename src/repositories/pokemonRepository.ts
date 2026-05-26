@@ -1,10 +1,10 @@
 import type { Pokemon, PokemonListItem } from "../models/pokemon";
 
 export interface PokemonRepository {
-    create(pokemon: Pokemon): Promise<void>;
-    getPokemonList(): Promise<PokemonListItem[]>;
-    getPokemonDetails(id: string): Promise<Pokemon>;
-    getPokemonDetailsByName(name: string): Promise<PokemonListItem | null>;
-    updatePokemon(pokemon: Pokemon): Promise<void>;
-    deletePokemon(id: string): Promise<void>;
+    create(userId: string, pokemon: Pokemon): Promise<void>;
+    getPokemonList(userId: string): Promise<PokemonListItem[]>;
+    getPokemonDetails(userId: string, pokemonId: string): Promise<Pokemon>;
+    getPokemonDetailsByName(userId: string, name: string): Promise<PokemonListItem | null>;
+    updatePokemon(userId: string, pokemon: Pokemon): Promise<void>;
+    deletePokemon(userId: string, pokemonId: string): Promise<void>;
 }

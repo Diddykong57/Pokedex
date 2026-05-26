@@ -5,27 +5,38 @@ import { LocalUserRepository } from "../../repositories/impl/local/localUserRepo
 import { UserService } from "../../services/userService";
 import { UserServiceImpl } from "../../services/impl/userServiceImpl";
 import { createUserHandler } from "./createUser";
+import { getAuthContext } from "../utils/authMiddleware";
 import { getUserDetailsHandler } from "./getUser";
+import { assertAdmin } from "../../utils/authorization";
+import { handleRequest } from "../utils/handleRequest";
+import { HTTP } from "../../global/constants/httpStatus";
+import { ApiResponse } from "../../global/types/api";
+import { badRequestError } from "../../utils/errorUtils";
 
 // const repository: UserRepository =
 //     process.env.APP_ENV === "aws" ? new DynamoUserRepository() : new LocalUserRepository();
 const repository: UserRepository = new LocalUserRepository();
 const service: UserService = new UserServiceImpl(repository);
 
-export const handler = async (event: APIGatewayProxyEvent) => {
+export const userMainHandler = async (event: APIGatewayProxyEvent): Promise<ApiResponse> => {
+
     switch (event.httpMethod) {
         case "POST":
-            return createUserHandler(service, event);
+            return handleRequest( async () => {
+                const auth = getAuthContext(event);
+                assertAdmin(auth);
+                return createUserHandler(service, event);
+            }, HTTP.CREATED)
 
         case "GET":
-            return getUserDetailsHandler(service, event);
+            return handleRequest( async () => {
+                const auth = getAuthContext(event);
+                return getUserDetailsHandler(service, auth.userId);
+            })
 
         default:
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    message: ERROR_MESSAGES.INVALID_METHOD,
-                }),
-            };
+            return handleRequest(async () => {
+                throw badRequestError(ERROR_MESSAGES.INVALID_METHOD);
+            })
     }
 };

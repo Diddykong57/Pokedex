@@ -10,31 +10,44 @@ import type { PokemonService } from "../../services/pokemonService";
 import { PokemonServiceImpl } from "../../services/impl/pokemonServiceImpl";
 import { updatePokemonHandler } from "./updatePokemon";
 import { deletePokemonHandler } from "./deletePokemon";
+import { handleRequest } from "../utils/handleRequest";
+import { getAuthContext } from "../utils/authMiddleware";
+import { badRequestError } from "../../utils/errorUtils";
+import { HTTP } from "../../global/constants/httpStatus";
 
 const repository: PokemonRepository =
     process.env.APP_ENV === "aws" ? new DynamoPokemonRepository() : new LocalPokemonRepository();
 const service: PokemonService = new PokemonServiceImpl(repository);
 
-export const handler = async (event: APIGatewayProxyEvent) => {
+export const pokemonMainHandler = async (event: APIGatewayProxyEvent) => {
     switch (event.httpMethod) {
         case "POST":
-            return createPokemonHandler(service, event);
+            return handleRequest( async () => {
+                const auth = getAuthContext(event);
+                return createPokemonHandler(service, auth.userId, event);
+            }, HTTP.CREATED)
         case "GET":
-            if (event.pathParameters?.id) {
-                return getPokemonDetailsHandler(service, event);
-            }
-            return getPokemonListHandler(service);
+            return handleRequest( async () => {
+                const auth = getAuthContext(event);
+                if (event.pathParameters?.id) {
+                    return getPokemonDetailsHandler(service, auth.userId, event.pathParameters.id);
+                }
+                return getPokemonListHandler(service, auth.userId);
+            })
         case "PUT":
-            return updatePokemonHandler(service, event);
+            return handleRequest( async () => {
+                const auth = getAuthContext(event);
+                return updatePokemonHandler(service, auth.userId, event);
+            })
         case "DELETE":
-            return deletePokemonHandler(service, event);
+            return handleRequest( async () => {
+                const auth = getAuthContext(event);
+                return deletePokemonHandler(service, auth.userId, event);
+            })
 
         default:
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    message: ERROR_MESSAGES.INVALID_METHOD,
-                }),
-            };
+            return handleRequest(async () => {
+                throw badRequestError(ERROR_MESSAGES.INVALID_METHOD);
+            })
     }
 };

@@ -1,12 +1,12 @@
 import { UserRepository } from "../../userRepository";
 import { User } from "../../../models/user";
-import { UserItem, UserProfileItem } from "../../types/userItem";
+import { UserProfileItem } from "../../types/userItem";
 import { toUserDetails, toUserFromProfileItem, toUserItems } from "../../../mappers/userMapper";
 import { USER_ITEM } from "../../../global/constants/user";
 import { notFoundError } from "../../../utils/errorUtils";
 import { ERROR_MESSAGES } from "../../../global/constants/errorMessages";
 
-const fakeUserDb: UserItem[] = [];
+const fakeUserDb: UserProfileItem[] = [];
 
 export class LocalUserRepository implements UserRepository {
     async create(user: User): Promise<void> {

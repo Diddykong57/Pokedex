@@ -1,5 +1,6 @@
 export const USER_ITEM = {
     PK_PREFIX: "USER",
+    NAME: "USER",
     PROFILE: {
         SK: "PROFILE",
         GSI1PK: "POKEMON",
