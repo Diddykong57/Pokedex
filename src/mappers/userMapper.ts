@@ -31,3 +31,9 @@ export const toUserResponseDto = (user: User): UserResponseDto => ({
     createdAt: user.createdAt
 })
 
+export const toUserDetails = (profile: UserProfileItem): User => ({
+    id: profile.PK.replace(`${USER_ITEM.PK_PREFIX}`, ""),
+    email: profile.email,
+    nickname: profile.nickname,
+    createdAt: profile.createdAt,
+})

@@ -1,8 +1,10 @@
 import { UserRepository } from "../../userRepository";
 import { User } from "../../../models/user";
 import { UserItem, UserProfileItem } from "../../types/userItem";
-import { toUserFromProfileItem, toUserItems } from "../../../mappers/userMapper";
+import { toUserDetails, toUserFromProfileItem, toUserItems } from "../../../mappers/userMapper";
 import { USER_ITEM } from "../../../global/constants/user";
+import { notFoundError } from "../../../utils/errorUtils";
+import { ERROR_MESSAGES } from "../../../global/constants/errorMessages";
 
 const fakeUserDb: UserItem[] = [];
 
@@ -25,6 +27,26 @@ export class LocalUserRepository implements UserRepository {
         }
 
         return toUserFromProfileItem(user);
+    }
+
+    async getUserDetails(id: string): Promise<User> {
+        const pk = `${USER_ITEM.PK_PREFIX}#${id}`;
+
+        const profile = await this.getProfile(pk);
+
+        return toUserDetails(profile);
+    }
+
+    private async getProfile(pk: string): Promise<UserProfileItem> {
+        const profile = fakeUserDb.find(
+            (item): item is UserProfileItem => item.PK === pk && item.SK === USER_ITEM.PROFILE.SK
+        );
+
+        if (!profile) {
+            throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
+        }
+
+        return profile;
     }
 }
 

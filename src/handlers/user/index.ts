@@ -5,6 +5,7 @@ import { LocalUserRepository } from "../../repositories/impl/local/localUserRepo
 import { UserService } from "../../services/userService";
 import { UserServiceImpl } from "../../services/impl/userServiceImpl";
 import { createUserHandler } from "./createUser";
+import { getUserDetailsHandler } from "./getUser";
 
 // const repository: UserRepository =
 //     process.env.APP_ENV === "aws" ? new DynamoUserRepository() : new LocalUserRepository();
@@ -15,6 +16,9 @@ export const handler = async (event: APIGatewayProxyEvent) => {
     switch (event.httpMethod) {
         case "POST":
             return createUserHandler(service, event);
+
+        case "GET":
+            return getUserDetailsHandler(service, event);
 
         default:
             return {

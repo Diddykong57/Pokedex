@@ -4,7 +4,7 @@ import { getPokemonListHandler } from "./handlers/pokemon/getPokemonList";
 import { getPokemonDetailsHandler } from "./handlers/pokemon/getPokemonDetails";
 import { updatePokemonHandler } from "./handlers/pokemon/updatePokemon";
 import { pokemonCreateFixture, pokemonUpdateFixture } from "./tests/fixtures/pokemon";
-import type { ApiResponse } from "./global/types/api";
+import type { ApiRequest, ApiResponse } from "./global/types/api";
 import { deletePokemonHandler } from "./handlers/pokemon/deletePokemon";
 import type { PokemonRepository } from "./repositories/pokemonRepository";
 import { DynamoPokemonRepository } from "./repositories/impl/dynamoDB/dynamoPokemonRepository";
@@ -16,6 +16,7 @@ import { UserService } from "./services/userService";
 import { UserServiceImpl } from "./services/impl/userServiceImpl";
 import { createUserHandler } from "./handlers/user/createUser";
 import { userCreateFixture } from "./tests/fixtures/user";
+import { getUserDetailsHandler } from "./handlers/user/getUser";
 
 const pokemonRepository: PokemonRepository =
     process.env.APP_ENV === "aws" ? new DynamoPokemonRepository() : new LocalPokemonRepository();
@@ -87,8 +88,22 @@ async function main() {
     await createUserHandler(userService, { body: JSON.stringify(userCreateFixture[1]) });
     await createUserHandler(userService, { body: JSON.stringify(userCreateFixture[2]) });
 
-    console.log("Fake DB content:");
-    console.dir(getFakeUserDb(), { depth: null });
+//     console.log("Fake DB content:");
+//     console.dir(getFakeUserDb(), { depth: null });
+
+    const body = JSON.parse(response.body);
+
+    response = await getUserDetailsHandler(
+        userService,
+        {
+            pathParameters: {
+                id: body.id,
+            },
+        }
+    );
+
+    console.log("[getUserDetailsHandler] HTTP response:");
+    console.log(response);
 }
 
 main();
