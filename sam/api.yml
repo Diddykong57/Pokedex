@@ -108,7 +108,7 @@ Resources:
 
     Properties:
       CodeUri: ../dist
-      Handler: handlers/pokemon/index.handler
+      Handler: handlers/pokemon/index.pokemonMainHandler
 
       Environment:
         Variables:
@@ -125,17 +125,17 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref PokedexApi
-            Path: /pokemon
+            Path: /users/me/pokemons
             Method: get
             Auth:
-              Authorizer: NONE
+              Authorizer: CognitoAuthorizer
 
         # Private route: create a Pokemon
         PokemonCreate:
           Type: Api
           Properties:
             RestApiId: !Ref PokedexApi
-            Path: /pokemon
+            Path: /users/me/pokemons
             Method: post
             Auth:
               Authorizer: CognitoAuthorizer
@@ -145,17 +145,17 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref PokedexApi
-            Path: /pokemon/{id}
+            Path: /users/me/pokemons/{id}
             Method: get
             Auth:
-              Authorizer: NONE
+              Authorizer: CognitoAuthorizer
 
         # Private route: update one Pokemon
         PokemonUpdate:
           Type: Api
           Properties:
             RestApiId: !Ref PokedexApi
-            Path: /pokemon/{id}
+            Path: /users/me/pokemons/{id}
             Method: put
             Auth:
               Authorizer: CognitoAuthorizer
@@ -165,7 +165,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref PokedexApi
-            Path: /pokemon/{id}
+            Path: /users/me/pokemons/{id}
             Method: delete
             Auth:
               Authorizer: CognitoAuthorizer
@@ -176,7 +176,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ../dist
-      Handler: handlers/user/createUser.createUserHandler
+      Handler: handlers/user/createUser.userMainHandler
 
       Environment:
         Variables:
@@ -202,6 +202,15 @@ Resources:
             RestApiId: !Ref PokedexApi
             Path: /admin/users
             Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+        UserGetDetails:
+          Type: Api
+          Properties:
+            RestApiId: !Ref PokedexApi
+            Path: /users/me
+            Method: get
             Auth:
               Authorizer: CognitoAuthorizer
 
