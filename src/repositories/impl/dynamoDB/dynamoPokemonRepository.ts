@@ -2,11 +2,12 @@ import type { Pokemon, PokemonListItem } from "../../../models/pokemon";
 import { toPokemonDetails, toPokemonFromMetadataItem, toPokemonItems } from "../../../mappers/pokemonMapper";
 import type { PokemonRepository } from "../../pokemonRepository";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient, DeleteCommand, GetCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, DynamoDBDocumentClient, DeleteCommand, GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { POKEMON_ITEM } from "../../../global/constants/pokemon";
 import type { PokemonMetadataItem, PokemonStatsItem } from "../../types/pokemonItem";
 import { notFoundError } from "../../../utils/errorUtils";
 import { ERROR_MESSAGES } from "../../../global/constants/errorMessages";
+import { USER_ITEM } from "../../../global/constants/user";
 
 const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
@@ -14,53 +15,54 @@ const docClient = DynamoDBDocumentClient.from(client);
 export class DynamoPokemonRepository implements PokemonRepository {
     private readonly tableName = process.env.TABLE_NAME!;
 
-    async create(pokemon: Pokemon): Promise<void> {
-        await this.savePokemon(pokemon);
+    async create(userId: string, pokemon: Pokemon): Promise<void> {
+        await this.savePokemon(userId, pokemon);
     }
 
-    async deletePokemon(id: string): Promise<void> {
-        const pk = this.buildPk(id);
-
-        await docClient.send(
-            new DeleteCommand({
+    async getPokemonList(userId: string): Promise<PokemonListItem[]> {
+        const pk = this.buildPk(userId);
+        const skPrefix = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}#`;
+        const response = await docClient.send(
+            new QueryCommand({
                 TableName: this.tableName,
-                Key: {
-                    PK: pk,
-                    SK: POKEMON_ITEM.METADATA.SK,
+                KeyConditionExpression: "PK = :pk AND begins_with(SK, :skPrefix)",
+                ExpressionAttributeValues: {
+                    ":pk": pk,
+                    ":skPrefix": skPrefix,
                 },
             })
         );
 
-        await docClient.send(
-            new DeleteCommand({
-                TableName: this.tableName,
-                Key: {
-                    PK: pk,
-                    SK: POKEMON_ITEM.STATS.SK,
-                },
-            })
-        );
+        const pokemonList = (response.Items ?? []) as PokemonMetadataItem[];
+
+        return pokemonList.map(item => toPokemonFromMetadataItem(item));
     }
 
-    async getPokemonDetails(id: string): Promise<Pokemon> {
-        const pk = this.buildPk(id);
+    async getPokemonDetails(userId:string, pokemonId:string): Promise<Pokemon> {
+        const pk = this.buildPk(userId);
+        const skMetadata = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}#${pokemonId}`;
+        const skStats = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.STATS.SK}#${pokemonId}`;
 
-        const metadata = await this.getMetadata(pk);
-        const stats = await this.getStats(pk);
+        const metadata = await this.getMetadata(pk, skMetadata);
+        const stats = await this.getStats(pk, skStats);
 
         return toPokemonDetails(metadata, stats);
     }
 
-    async getPokemonDetailsByName(name: string): Promise<PokemonListItem | null> {
+    async getPokemonDetailsByName(userId: string, name: string): Promise<PokemonListItem | null> {
+        const pk = this.buildPk(userId);
+        const skPrefix = `${POKEMON_ITEM.NAME}`;
         const response = await docClient.send(
-            new ScanCommand({
+            new QueryCommand({
                 TableName: this.tableName,
-                FilterExpression: "SK = :sk AND GSI1PK = :gsi1pk AND #name = :name",
+                KeyConditionExpression: "PK = :pk AND begins_with(SK, :skPrefix)",
+                FilterExpression: "GSI1PK = :gsi1pk AND #name = :name",
                 ExpressionAttributeNames: {
                     "#name": "name",
                 },
                 ExpressionAttributeValues: {
-                    ":sk": POKEMON_ITEM.METADATA.SK,
+                    ":pk": pk,
+                    ":skPrefix": skPrefix,
                     ":gsi1pk": POKEMON_ITEM.METADATA.GSI1PK,
                     ":name": name,
                 },
@@ -76,34 +78,43 @@ export class DynamoPokemonRepository implements PokemonRepository {
         return toPokemonFromMetadataItem(metadataItem);
     }
 
-    async getPokemonList(): Promise<PokemonListItem[]> {
-        const response = await docClient.send(
-            new ScanCommand({
+    async updatePokemon(userId: string, pokemon: Pokemon): Promise<void> {
+        await this.savePokemon(userId, pokemon);
+    }
+
+    async deletePokemon(userId: string, pokemonId: string): Promise<void> {
+        const pk = this.buildPk(userId);
+        const skMetadata = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}#${pokemonId}`;
+        const skStats = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.STATS.SK}#${pokemonId}`;
+
+        await docClient.send(
+            new DeleteCommand({
                 TableName: this.tableName,
-                FilterExpression: "SK = :sk AND GSI1PK = :gsi1pk",
-                ExpressionAttributeValues: {
-                    ":sk": POKEMON_ITEM.METADATA.SK,
-                    ":gsi1pk": POKEMON_ITEM.METADATA.GSI1PK,
+                Key: {
+                    PK: pk,
+                    SK: skMetadata,
                 },
             })
         );
 
-        const pokemonList = (response.Items ?? []) as PokemonMetadataItem[];
-
-        return pokemonList.map(item => toPokemonFromMetadataItem(item));
+        await docClient.send(
+            new DeleteCommand({
+                TableName: this.tableName,
+                Key: {
+                    PK: pk,
+                    SK: skStats,
+                },
+            })
+        );
     }
 
-    async updatePokemon(pokemon: Pokemon): Promise<void> {
-        await this.savePokemon(pokemon);
-    }
-
-    private async getMetadata(pk: string): Promise<PokemonMetadataItem> {
+    private async getMetadata(pk: string, sk: string): Promise<PokemonMetadataItem> {
         const response = await docClient.send(
             new GetCommand({
                 TableName: this.tableName,
                 Key: {
                     PK: pk,
-                    SK: POKEMON_ITEM.METADATA.SK,
+                    SK: sk,
                 },
             })
         );
@@ -115,13 +126,13 @@ export class DynamoPokemonRepository implements PokemonRepository {
         return response.Item as PokemonMetadataItem;
     }
 
-    private async getStats(pk: string): Promise<PokemonStatsItem> {
+    private async getStats(pk: string, sk: string): Promise<PokemonStatsItem> {
         const response = await docClient.send(
             new GetCommand({
                 TableName: this.tableName,
                 Key: {
                     PK: pk,
-                    SK: POKEMON_ITEM.STATS.SK,
+                    SK: sk,
                 },
             })
         );
@@ -133,12 +144,12 @@ export class DynamoPokemonRepository implements PokemonRepository {
         return response.Item as PokemonStatsItem;
     }
 
-    private buildPk(id: string): string {
-        return `${POKEMON_ITEM.PK_PREFIX}#${id}`;
+    private buildPk(userId: string): string {
+        return `${USER_ITEM.PK_PREFIX}#${userId}`;
     }
 
-    private async savePokemon(pokemon: Pokemon): Promise<void> {
-        const [metadataItem, statsItem] = toPokemonItems(pokemon);
+    private async savePokemon(userId: string, pokemon: Pokemon): Promise<void> {
+        const [metadataItem, statsItem] = toPokemonItems(userId, pokemon);
 
         await docClient.send(
             new PutCommand({
