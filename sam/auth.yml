@@ -47,6 +47,26 @@ Resources:
         - ALLOW_REFRESH_TOKEN_AUTH
         - ALLOW_USER_SRP_AUTH
       PreventUserExistenceErrors: ENABLED
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthScopes:
+        - openid
+        - email
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs:
+        - http://localhost:3000/oauth2-redirect.html
+        - https://diddykong57.github.io/Pokedex/oauth2-redirect.html
+      LogoutURLs:
+        - http://localhost:3000/docs/
+        - https://diddykong57.github.io/Pokedex/
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub "pokedex-diddykong57-auth"
+      UserPoolId: !Ref UserPool
 
   AdminGroup:
     Type: AWS::Cognito::UserPoolGroup

@@ -9,11 +9,11 @@ export const getAuthContext = (event: APIGatewayProxyEvent): AuthContext => {
         throw unauthorizedError("Missing authenticated user");
     }
 
-    const rawGroups = claims["cognito:groups"];
+    const rawGroups = claims["cognito:groups"] ?? "";
 
     return {
         userId: claims.sub,
         email: claims.email,
-        groups: rawGroups.split(","),
+        groups: rawGroups ? rawGroups.split(",") : [],
     };
 };

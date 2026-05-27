@@ -1,0 +1,35 @@
+CreateUserRequest:
+  type: object
+  required:
+    - email
+    - nickname
+  properties:
+    email:
+      type: string
+      format: email
+      minLength: 2
+      maxLength: 255
+      example: ash@example.com
+    nickname:
+      type: string
+      minLength: 2
+      maxLength: 70
+      example: Ash
+
+UserResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      example: user-001
+    email:
+      type: string
+      format: email
+      example: ash@example.com
+    nickname:
+      type: string
+      example: Ash
+    createdAt:
+      type: string
+      format: date-time
+      example: 2026-04-18T10:00:00.000Z

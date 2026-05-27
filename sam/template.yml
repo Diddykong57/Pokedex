@@ -160,6 +160,10 @@ Outputs:
     Description: Cognito User Pool ID
     Value: !GetAtt AuthApp.Outputs.UserPoolId
 
+  UserPoolClientId:
+    Description: Cognito User Pool Client ID
+    Value: !GetAtt AuthApp.Outputs.UserPoolClientId
+
   UserPoolArn:
     Description: Cognito User Pool ARN (consommé par le service fight pour JWT auth)
     Value: !GetAtt AuthApp.Outputs.UserPoolArn

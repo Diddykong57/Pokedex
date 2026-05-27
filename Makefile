@@ -81,6 +81,7 @@ deploy: template-output.yml $(initStackName).outputs
 			Environment=$(env) \
 			StackSuffix=$(stackNameSuffix) \
 			LoggerLevel=$(logLevel)
+	STACK_NAME=$(stackName) AWS_REGION=$(region) node scripts/update-swagger-config.js
 
 #deployBKP: template-output.yml $(initStackName).outputs
 #	sam deploy \
@@ -116,7 +117,7 @@ clean:
 debug:
 	aws cloudformation describe-stack-events \
 	  --region $(region) \
-	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-ApiApp-1C8JP1JQEU4MQ/5c29ae70-5531-11f1-80c1-0a36288d01b9
+	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-AuthApp-1VNHC390TMFSF/4788eb70-5531-11f1-ae42-0ac5d11bcf4d
 
 
 test: clean build package

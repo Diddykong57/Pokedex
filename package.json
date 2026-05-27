@@ -12,7 +12,8 @@
         "lint": "eslint .",
         "lint:fix": "npm run lint -- --fix",
         "prettier": "prettier --write .",
-        "prettylint": "npm run prettier && npm run lint:fix"
+        "prettylint": "npm run prettier && npm run lint:fix",
+        "swagger": "sh -c 'sleep 1; open http://localhost:3000/ & python3 -m http.server 3000 --directory docs'"
     },
     "repository": {
         "type": "git",

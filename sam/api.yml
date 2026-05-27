@@ -39,6 +39,7 @@ Globals:
     # If is required here to pass a list of layers, or an empty string (not an empty list)
     Environment:
       Variables:
+        APP_ENV: aws
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
         LOGGER_LEVEL: !Ref LoggerLevel
         NODE_OPTIONS: "--enable-source-maps"
@@ -72,6 +73,20 @@ Resources:
           ThrottlingRateLimit: 5
           ThrottlingBurstLimit: 10
       GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+              Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
+
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+              Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
+
         UNAUTHORIZED:
           StatusCode: "401"
           ResponseTemplates:
@@ -79,8 +94,10 @@ Resources:
           ResponseParameters:
             Headers:
               Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+              Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
       Cors:
-        AllowMethods: "'GET,POST,PUT,DELETE'"
+        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
         AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
         AllowOrigin: "'*'"
         MaxAge: "'600'"
@@ -129,6 +146,9 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - openid
+                - email
 
         # Private route: create a Pokemon
         PokemonCreate:
@@ -139,6 +159,9 @@ Resources:
             Method: post
             Auth:
               Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - openid
+                - email
 
         # Public route: get one Pokemon by ID
         PokemonGetDetails:
@@ -149,6 +172,9 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - openid
+                - email
 
         # Private route: update one Pokemon
         PokemonUpdate:
@@ -159,6 +185,9 @@ Resources:
             Method: put
             Auth:
               Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - openid
+                - email
 
         # Private route: delete one Pokemon
         PokemonDelete:
@@ -169,6 +198,9 @@ Resources:
             Method: delete
             Auth:
               Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - openid
+                - email
 
 
   # Admin lambda to manage users
@@ -176,7 +208,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ../dist
-      Handler: handlers/user/createUser.userMainHandler
+      Handler: handlers/user/index.userMainHandler
 
       Environment:
         Variables:
@@ -204,6 +236,9 @@ Resources:
             Method: post
             Auth:
               Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - openid
+                - email
 
         UserGetDetails:
           Type: Api
@@ -213,6 +248,9 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - openid
+                - email
 
 Outputs:
   ApiId:

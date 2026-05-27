@@ -1,0 +1,7 @@
+get:
+  tags:
+    - HealthCheck
+  summary: Check API health status
+  responses:
+    '200':
+      description: API is running

@@ -1,9 +1,5 @@
 window.onload = function () {
-    const isLocalhost = window.location.hostname === "localhost";
-
-    const redirectUrl = isLocalhost
-        ? "http://localhost:3000/docs/oauth2-redirect.html"
-        : "https://diddykong57.github.io/Pokedex/oauth2-redirect.html";
+    const redirectUrl = `${window.location.origin}${window.location.pathname.replace(/\/$/, "")}/oauth2-redirect.html`;
 
     const ui = SwaggerUIBundle({
         url: "./openapi.yaml",
@@ -18,7 +14,7 @@ window.onload = function () {
     });
 
     ui.initOAuth({
-        clientId: "5e1sv0erm0h9nhhtvin5lh7cci",
+        clientId: window.POKEDEX_SWAGGER_CONFIG.cognitoClientId,
         usePkceWithAuthorizationCodeGrant: true,
         scopes: ["openid", "email"]
     });

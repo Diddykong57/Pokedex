@@ -1,0 +1,142 @@
+CreatePokemonRequest:
+  type: object
+  required:
+    - name
+    - types
+    - description
+    - region
+    - level
+    - hp
+    - attack
+    - defense
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 50
+      example: Pikachu
+    types:
+      type: array
+      minItems: 1
+      items:
+        type: string
+        minLength: 3
+        maxLength: 20
+      example:
+        - Electric
+    description:
+      type: string
+      minLength: 10
+      maxLength: 500
+      example: Small yellow Pokémon able to generate electricity
+    region:
+      type: string
+      minLength: 2
+      maxLength: 50
+      example: Kanto
+    level:
+      type: integer
+      minimum: 80
+      maximum: 120
+      example: 100
+    hp:
+      type: integer
+      minimum: 1
+      example: 380
+    attack:
+      type: integer
+      minimum: 1
+      example: 250
+    defense:
+      type: integer
+      minimum: 1
+      example: 180
+
+UpdatePokemonRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 50
+      example: Pikachu
+    types:
+      type: array
+      minItems: 1
+      items:
+        type: string
+        minLength: 3
+        maxLength: 20
+      example:
+        - Electric
+    description:
+      type: string
+      minLength: 10
+      maxLength: 500
+      example: Updated electric Pokémon description
+    region:
+      type: string
+      minLength: 2
+      maxLength: 50
+      example: Kanto
+    level:
+      type: integer
+      minimum: 80
+      maximum: 120
+      example: 100
+    hp:
+      type: integer
+      minimum: 1
+      example: 400
+    attack:
+      type: integer
+      minimum: 1
+      example: 260
+    defense:
+      type: integer
+      minimum: 1
+      example: 190
+
+PokemonListResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      example: 018f6e4a-9b72-7f9a-bc41-82d4e8f9c123
+    name:
+      type: string
+      example: Pikachu
+    types:
+      type: array
+      items:
+        type: string
+      example:
+        - Electric
+    description:
+      type: string
+      example: Small yellow Pokémon able to generate electricity
+    region:
+      type: string
+      example: Kanto
+
+PokemonResponse:
+  allOf:
+    - $ref: '#/PokemonListResponse'
+    - type: object
+      properties:
+        level:
+          type: integer
+          example: 100
+        hp:
+          type: integer
+          example: 380
+        attack:
+          type: integer
+          example: 250
+        defense:
+          type: integer
+          example: 180
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-04-18T10:00:00.000Z

@@ -1,0 +1,9 @@
+cognitoAuth:
+  type: oauth2
+  flows:
+    authorizationCode:
+      authorizationUrl: https://pokedex-diddykong57-auth.auth.eu-west-3.amazoncognito.com/oauth2/authorize
+      tokenUrl: https://pokedex-diddykong57-auth.auth.eu-west-3.amazoncognito.com/oauth2/token
+      scopes:
+        openid: OpenID scope
+        email: Email scope
