@@ -5,14 +5,16 @@ import { PokemonRepository } from "../../repositories/pokemonRepository";
 describe("pokemonService", () => {
     it("should build pokemon then call pokemonRepository.create", async () => {
         const createMock = jest.fn().mockResolvedValue(undefined);
+        const getPokemonDetailsByNameMock = jest.fn().mockResolvedValue(null);
 
-        // create fake repo (= mock)
         const pokemonRepository = {
             create: createMock,
-            getPokemonDetailsByName: jest.fn(),
+            getPokemonDetailsByName: getPokemonDetailsByNameMock,
         } as unknown as PokemonRepository;
 
         const service = new PokemonServiceImpl(pokemonRepository);
+
+        const userId = "user-001";
 
         const data: CreatePokemonRequestDto = {
             name: "Pikachu",
@@ -26,12 +28,14 @@ describe("pokemonService", () => {
             defense: 180,
         };
 
-        await service.createPokemon(data);
+        await service.createPokemon(userId, data);
 
+        expect(getPokemonDetailsByNameMock).toHaveBeenCalledWith(userId, "Pikachu");
         expect(createMock).toHaveBeenCalledTimes(1);
 
-        const pokemonSent = createMock.mock.calls[0][0];
+        const [userIdSent, pokemonSent] = createMock.mock.calls[0];
 
+        expect(userIdSent).toBe(userId);
         expect(pokemonSent.id).toEqual(expect.any(String));
         expect(pokemonSent.createdAt).toEqual(expect.any(String));
         expect(pokemonSent.name).toBe("Pikachu");

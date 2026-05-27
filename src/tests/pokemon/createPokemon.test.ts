@@ -1,62 +1,69 @@
-import { createPokemonHandler } from "../../handlers/pokemon/createPokemon";
-import { getFakeDb, LocalPokemonRepository } from "../../repositories/impl/local/localPokemonRepository";
-import { PokemonServiceImpl } from "../../services/impl/pokemonServiceImpl";
+import { getFakeDb } from "../../repositories/impl/local/localPokemonRepository";
+import { buildApiEvent } from "../fixtures/buildApiEvent";
+import { pokemonMainHandler } from "../../handlers/pokemon";
 
 describe("createPokemon", () => {
     beforeEach(() => {
         getFakeDb().splice(0);
     });
 
-    it("should create a pokemon and store it", async () => {
-        const repository = new LocalPokemonRepository();
-        const service = new PokemonServiceImpl(repository);
+    it("should create a pokemon attached to a user and store metadata + stats", async () => {
+        const userId = "user-001";
 
-        const response = await createPokemonHandler(service, {
-            body: JSON.stringify({
-                name: "Pikachu",
-                types: ["Electric"],
-                description:
-                    "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
-                region: "Kanto",
-                level: 100,
-                hp: 380,
-                attack: 250,
-                defense: 180,
-            }),
-        });
+        const response = await pokemonMainHandler(
+            buildApiEvent({
+                httpMethod: "POST",
+                body: JSON.stringify({
+                    name: "Pikachu",
+                    types: ["Electric"],
+                    description:
+                        "Petit et jaune aux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
+                    region: "Kanto",
+                    level: 100,
+                    hp: 380,
+                    attack: 250,
+                    defense: 180,
+                }),
+                requestContext: {
+                    authorizer: {
+                        claims: {
+                            sub: userId,
+                            "cognito:groups": "user",
+                        },
+                    },
+                }
+            })
+        );
 
-        const parsedBody = JSON.parse(response.body);
-
-        // check HTTP response
         expect(response.statusCode).toBe(201);
-        expect(parsedBody.name).toBe("Pikachu");
 
-        // check persistance
+        const body = JSON.parse(response.body);
+        expect(body.name).toBe("Pikachu");
+
         const db = getFakeDb();
 
-        expect(db.length).toBe(2); // METADATA + STATS
+        expect(db.length).toBe(2);
 
-        const metadataItem = db.find(item => item.SK === "METADATA");
-        const statsItem = db.find(item => item.SK === "STATS");
+        const metadataItem = db.find(item => item.SK.startsWith("POKEMON#METADATA#"));
+        const statsItem = db.find(item => item.SK.startsWith("POKEMON#STATS#"));
 
         expect(metadataItem).toBeDefined();
         expect(statsItem).toBeDefined();
 
-        if (!metadataItem || metadataItem.SK !== "METADATA") {
+        if (!metadataItem || !metadataItem.SK.startsWith("POKEMON#METADATA#")) {
             throw new Error("metadataItem not found");
         }
 
-        if (!statsItem || statsItem.SK !== "STATS") {
+        if (!statsItem || !statsItem.SK.startsWith("POKEMON#STATS#")) {
             throw new Error("statsItem not found");
         }
 
-        expect(metadataItem.PK).toContain("POKEMON#");
-        expect(metadataItem.SK).toBe("METADATA");
+        expect(metadataItem.PK).toBe(`USER#${userId}`);
         expect(metadataItem.GSI1PK).toBe("POKEMON");
         expect(metadataItem.GSI1SK).toBe("Pikachu");
+        expect(metadataItem.entityType).toBe("USER_POKEMON_METADATA");
 
-        expect(statsItem.PK).toContain("POKEMON#");
-        expect(statsItem.SK).toBe("STATS");
-        expect(statsItem.entityType).toBe("POKEMON_STATS");
+        expect(statsItem.PK).toBe(`USER#${userId}`);
+        expect(statsItem.entityType).toBe("USER_POKEMON_STATS");
     });
 });
