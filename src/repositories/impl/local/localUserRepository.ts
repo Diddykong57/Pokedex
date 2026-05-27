@@ -1,7 +1,7 @@
 import { UserRepository } from "../../userRepository";
 import { User } from "../../../models/user";
 import { UserProfileItem } from "../../types/userItem";
-import { toUserDetails, toUserFromProfileItem, toUserItems } from "../../../mappers/userMapper";
+import { toUserDetails, toUserItems } from "../../../mappers/userMapper";
 import { USER_ITEM } from "../../../global/constants/user";
 import { notFoundError } from "../../../utils/errorUtils";
 import { ERROR_MESSAGES } from "../../../global/constants/errorMessages";
@@ -13,20 +13,6 @@ export class LocalUserRepository implements UserRepository {
         const userItem = toUserItems(user);
 
         fakeUserDb.push(userItem);
-    }
-
-    async getUserDetailsByNickName(nickame: string): Promise<User | null> {
-        const user = fakeUserDb.find(
-            (item): item is UserProfileItem =>
-                item.SK === USER_ITEM.PROFILE.SK &&
-                item.nickname === nickame
-        );
-
-        if (!user) {
-            return null;
-        }
-
-        return toUserFromProfileItem(user);
     }
 
     async getUserDetails(id: string): Promise<User> {
