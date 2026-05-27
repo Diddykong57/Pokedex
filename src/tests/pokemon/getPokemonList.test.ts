@@ -14,29 +14,13 @@ describe("getPokemonList", () => {
         const repository = new LocalPokemonRepository();
         const service = new PokemonServiceImpl(repository);
 
-        await createPokemonHandler(
-            service,
-            userId,
-            buildApiEvent({ body: JSON.stringify(pokemonCreateFixture[0]) })
-        );
+        await createPokemonHandler(service, userId, buildApiEvent({ body: JSON.stringify(pokemonCreateFixture[0]) }));
 
-        await createPokemonHandler(
-            service,
-            userId,
-            buildApiEvent({ body: JSON.stringify(pokemonCreateFixture[1]) })
-        );
+        await createPokemonHandler(service, userId, buildApiEvent({ body: JSON.stringify(pokemonCreateFixture[1]) }));
 
-        await createPokemonHandler(
-            service,
-            userId,
-            buildApiEvent({ body: JSON.stringify(pokemonCreateFixture[2]) })
-        );
+        await createPokemonHandler(service, userId, buildApiEvent({ body: JSON.stringify(pokemonCreateFixture[2]) }));
 
-        await createPokemonHandler(
-            service,
-            userId,
-            buildApiEvent({ body: JSON.stringify(pokemonCreateFixture[3]) })
-        );
+        await createPokemonHandler(service, userId, buildApiEvent({ body: JSON.stringify(pokemonCreateFixture[3]) }));
     });
 
     it("should return a pokemon list", async () => {

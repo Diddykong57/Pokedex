@@ -1,57 +1,57 @@
 openapi: 3.0.3
 
 info:
-  title: Pokedex API
-  version: 2.0.0
-  description: REST API for managing a user Pokémon collection.
+    title: Pokedex API
+    version: 2.0.0
+    description: REST API for managing a user Pokémon collection.
 
 servers:
-  - url: https://9f1ws5ee1g.execute-api.eu-west-3.amazonaws.com/prod
+    - url: https://9f1ws5ee1g.execute-api.eu-west-3.amazonaws.com/prod
 
 tags:
-  - name: HealthCheck
-    description: API availability check
-  - name: Pokemon
-    description: Pokémon management
-  - name: User
-    description: User management
+    - name: HealthCheck
+      description: API availability check
+    - name: Pokemon
+      description: Pokémon management
+    - name: User
+      description: User management
 
 paths:
-  /healthCheck:
-    $ref: './paths/healthCheck.yaml'
+    /healthCheck:
+        $ref: "./paths/healthCheck.yaml"
 
-  /users/me/pokemons:
-    $ref: './paths/pokemons.yaml#/pokemonCollection'
+    /users/me/pokemons:
+        $ref: "./paths/pokemons.yaml#/pokemonCollection"
 
-  /users/me/pokemons/{id}:
-    $ref: './paths/pokemons.yaml#/pokemonItem'
+    /users/me/pokemons/{id}:
+        $ref: "./paths/pokemons.yaml#/pokemonItem"
 
-  /users/me:
-    $ref: './paths/users.yaml#/currentUser'
+    /users/me:
+        $ref: "./paths/users.yaml#/currentUser"
 
-  /admin/users:
-    $ref: './paths/users.yaml#/adminUsers'
+    /admin/users:
+        $ref: "./paths/users.yaml#/adminUsers"
 
 components:
-  securitySchemes:
-    cognitoAuth:
-      $ref: './components/securitySchemes.yaml#/cognitoAuth'
+    securitySchemes:
+        cognitoAuth:
+            $ref: "./components/securitySchemes.yaml#/cognitoAuth"
 
-  schemas:
-    CreatePokemonRequest:
-      $ref: './components/schemas/pokemon.yaml#/CreatePokemonRequest'
+    schemas:
+        CreatePokemonRequest:
+            $ref: "./components/schemas/pokemon.yaml#/CreatePokemonRequest"
 
-    UpdatePokemonRequest:
-      $ref: './components/schemas/pokemon.yaml#/UpdatePokemonRequest'
+        UpdatePokemonRequest:
+            $ref: "./components/schemas/pokemon.yaml#/UpdatePokemonRequest"
 
-    PokemonListResponse:
-      $ref: './components/schemas/pokemon.yaml#/PokemonListResponse'
+        PokemonListResponse:
+            $ref: "./components/schemas/pokemon.yaml#/PokemonListResponse"
 
-    PokemonResponse:
-      $ref: './components/schemas/pokemon.yaml#/PokemonResponse'
+        PokemonResponse:
+            $ref: "./components/schemas/pokemon.yaml#/PokemonResponse"
 
-    CreateUserRequest:
-      $ref: './components/schemas/user.yaml#/CreateUserRequest'
+        CreateUserRequest:
+            $ref: "./components/schemas/user.yaml#/CreateUserRequest"
 
-    UserResponse:
-      $ref: './components/schemas/user.yaml#/UserResponse'
+        UserResponse:
+            $ref: "./components/schemas/user.yaml#/UserResponse"

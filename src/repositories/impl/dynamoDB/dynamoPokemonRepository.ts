@@ -38,7 +38,7 @@ export class DynamoPokemonRepository implements PokemonRepository {
         return pokemonList.map(item => toPokemonFromMetadataItem(item));
     }
 
-    async getPokemonDetails(userId:string, pokemonId:string): Promise<Pokemon> {
+    async getPokemonDetails(userId: string, pokemonId: string): Promise<Pokemon> {
         const pk = this.buildPk(userId);
         const skMetadata = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}#${pokemonId}`;
         const skStats = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.STATS.SK}#${pokemonId}`;

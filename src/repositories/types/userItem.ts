@@ -1,6 +1,6 @@
 import { BaseItem } from "./baseItem";
 
-export interface UserProfileItem extends BaseItem{
+export interface UserProfileItem extends BaseItem {
     SK: "PROFILE";
     entityType: "USER_PROFILE";
     userId: string;

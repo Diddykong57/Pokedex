@@ -22,32 +22,32 @@ const service: PokemonService = new PokemonServiceImpl(repository);
 export const pokemonMainHandler = async (event: APIGatewayProxyEvent) => {
     switch (event.httpMethod) {
         case "POST":
-            return handleRequest( async () => {
+            return handleRequest(async () => {
                 const auth = getAuthContext(event);
                 return createPokemonHandler(service, auth.userId, event);
-            }, HTTP.CREATED)
+            }, HTTP.CREATED);
         case "GET":
-            return handleRequest( async () => {
+            return handleRequest(async () => {
                 const auth = getAuthContext(event);
                 if (event.pathParameters?.id) {
                     return getPokemonDetailsHandler(service, auth.userId, event.pathParameters.id);
                 }
                 return getPokemonListHandler(service, auth.userId);
-            })
+            });
         case "PUT":
-            return handleRequest( async () => {
+            return handleRequest(async () => {
                 const auth = getAuthContext(event);
                 return updatePokemonHandler(service, auth.userId, event);
-            })
+            });
         case "DELETE":
-            return handleRequest( async () => {
+            return handleRequest(async () => {
                 const auth = getAuthContext(event);
                 return deletePokemonHandler(service, auth.userId, event);
-            }, HTTP.NO_CONTENT)
+            }, HTTP.NO_CONTENT);
 
         default:
             return handleRequest(async () => {
                 throw badRequestError(ERROR_MESSAGES.INVALID_METHOD);
-            })
+            });
     }
 };

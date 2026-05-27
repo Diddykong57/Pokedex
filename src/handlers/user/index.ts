@@ -24,24 +24,23 @@ const identityRepository: IdentityRepository =
 const service: UserService = new UserServiceImpl(userRepository, identityRepository);
 
 export const userMainHandler = async (event: APIGatewayProxyEvent): Promise<ApiResponse> => {
-
     switch (event.httpMethod) {
         case "POST":
-            return handleRequest( async () => {
+            return handleRequest(async () => {
                 const auth = getAuthContext(event);
                 assertAdmin(auth);
                 return createUserHandler(service, event);
-            }, HTTP.CREATED)
+            }, HTTP.CREATED);
 
         case "GET":
-            return handleRequest( async () => {
+            return handleRequest(async () => {
                 const auth = getAuthContext(event);
                 return getUserDetailsHandler(service, auth.userId);
-            })
+            });
 
         default:
             return handleRequest(async () => {
                 throw badRequestError(ERROR_MESSAGES.INVALID_METHOD);
-            })
+            });
     }
 };

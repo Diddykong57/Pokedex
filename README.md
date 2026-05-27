@@ -1,4 +1,3 @@
-
 # Pokedex API
 
 API REST de gestion d’un catalogue de Pokémon.
@@ -79,7 +78,7 @@ Projet backend réalisé dans le cadre d’un exercice technique pour **Novatraq
 GET /healthCheck
 GET /pokemon
 GET /pokemon/{id}
-````
+```
 
 ## Protégés
 
@@ -91,8 +90,8 @@ DELETE /pokemon/{id}
 
 ## Exemple d’architecture des routes
 
-* `/healthCheck` → Lambda **pokedex-healthcheck**
-* `/pokemon/*` → Lambda **pokedex-api**
+- `/healthCheck` → Lambda **pokedex-healthcheck**
+- `/pokemon/*` → Lambda **pokedex-api**
 
 ---
 
@@ -142,7 +141,7 @@ src/
 ```bash
 npm install
 npm run dev
-npm test 
+npm test
 ```
 
 ---
@@ -157,11 +156,11 @@ npm run deploy
 
 # Bonus
 
-* Authentification Cognito
-* Déploiement AWS
-* Infrastructure as Code (SAM)
-* Documentation Swagger
-* Tests unitaires
+- Authentification Cognito
+- Déploiement AWS
+- Infrastructure as Code (SAM)
+- Documentation Swagger
+- Tests unitaires
 
 ---
 

@@ -5,18 +5,15 @@ window.onload = function () {
         url: "./openapi.yaml",
         dom_id: "#swagger-ui",
         deepLinking: true,
-        presets: [
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIStandalonePreset
-        ],
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
         layout: "StandaloneLayout",
-        oauth2RedirectUrl: redirectUrl
+        oauth2RedirectUrl: redirectUrl,
     });
 
     ui.initOAuth({
         clientId: window.POKEDEX_SWAGGER_CONFIG.cognitoClientId,
         usePkceWithAuthorizationCodeGrant: true,
-        scopes: ["openid", "email"]
+        scopes: ["openid", "email"],
     });
 
     window.ui = ui;

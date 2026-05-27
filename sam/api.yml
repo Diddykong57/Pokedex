@@ -5,257 +5,256 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  ServiceName:
-    Description: Name of the service
-    Type: String
-  Layer:
-    Description: Layer containing node_modules
-    Type: String
-    Default: ""
-  LoggerLevel:
-    Description: "the logger lever used to filter output, can be on of error,warning,info,trace"
-    Type: String
-    Default: info
-  EventBusName:
-    Description: "the event bus used to put message and read messages. used to test the domain without interferences with others"
-    Type: String
-    Default: default
-  UserPoolId:
-    Description: User Pool ID
-    Type: String
-  UserPoolArn:
-    Description: User Pool ARN
-    Type: String
-  TableName:
-    Description: Dynamo Table Name
-    Type: String
+    ServiceName:
+        Description: Name of the service
+        Type: String
+    Layer:
+        Description: Layer containing node_modules
+        Type: String
+        Default: ""
+    LoggerLevel:
+        Description: "the logger lever used to filter output, can be on of error,warning,info,trace"
+        Type: String
+        Default: info
+    EventBusName:
+        Description: "the event bus used to put message and read messages. used to test the domain without interferences with others"
+        Type: String
+        Default: default
+    UserPoolId:
+        Description: User Pool ID
+        Type: String
+    UserPoolArn:
+        Description: User Pool ARN
+        Type: String
+    TableName:
+        Description: Dynamo Table Name
+        Type: String
 
 Globals:
-  Function:
-    Runtime: nodejs22.x
-    MemorySize: 1024
-    Timeout: 30
-    Layers: !If [IsLayerEmpty, [], [!Ref Layer]] # Set default layer for all lambdas
-    # If is required here to pass a list of layers, or an empty string (not an empty list)
-    Environment:
-      Variables:
-        APP_ENV: aws
-        AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
-        LOGGER_LEVEL: !Ref LoggerLevel
-        NODE_OPTIONS: "--enable-source-maps"
-        EVENT_BUS_NAME: !Ref EventBusName
-    Tracing: Active
+    Function:
+        Runtime: nodejs22.x
+        MemorySize: 1024
+        Timeout: 30
+        Layers: !If [IsLayerEmpty, [], [!Ref Layer]] # Set default layer for all lambdas
+        # If is required here to pass a list of layers, or an empty string (not an empty list)
+        Environment:
+            Variables:
+                APP_ENV: aws
+                AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+                LOGGER_LEVEL: !Ref LoggerLevel
+                NODE_OPTIONS: "--enable-source-maps"
+                EVENT_BUS_NAME: !Ref EventBusName
+        Tracing: Active
 
 Conditions:
-  IsLayerEmpty: !Equals [!Ref Layer, ""]
+    IsLayerEmpty: !Equals [!Ref Layer, ""]
 
 Resources:
-  PokedexApi:
-    Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Delete
-    Properties:
-      Name: !Sub "${ServiceName}-api"
-      StageName: prod
-      TracingEnabled: true
-      EndpointConfiguration:
-        Type: REGIONAL
-      Auth:
-        DefaultAuthorizer: CognitoAuthorizer
-        AddDefaultAuthorizerToCorsPreflight: false
-        Authorizers:
-          CognitoAuthorizer:
-            UserPoolArn: !Ref UserPoolArn
-      MethodSettings:
-        - ResourcePath: "/*"
-          HttpMethod: "*"
-          MetricsEnabled: true
-          ThrottlingRateLimit: 5
-          ThrottlingBurstLimit: 10
-      GatewayResponses:
-        DEFAULT_4XX:
-          ResponseParameters:
-            Headers:
-              Access-Control-Allow-Origin: "'*'"
-              Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
-              Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
-
-        DEFAULT_5XX:
-          ResponseParameters:
-            Headers:
-              Access-Control-Allow-Origin: "'*'"
-              Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
-              Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
-
-        UNAUTHORIZED:
-          StatusCode: "401"
-          ResponseTemplates:
-            application/json: '{"message": $context.error.messageString}'
-          ResponseParameters:
-            Headers:
-              Access-Control-Allow-Origin: "'*'"
-              Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
-              Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
-      Cors:
-        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-        AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
-        AllowOrigin: "'*'"
-        MaxAge: "'600'"
-
-  # Public Lambda used to check if API is alive
-  HealthCheckFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../dist
-      Handler: handlers/healthCheck.healthCheckHandler
-
-      Events:
-        HealthCheckApi:
-          Type: Api
-          Properties:
-            RestApiId: !Ref PokedexApi
-            Path: /healthCheck
-            Method: get
+    PokedexApi:
+        Type: AWS::Serverless::Api
+        DeletionPolicy: Delete
+        UpdateReplacePolicy: Delete
+        Properties:
+            Name: !Sub "${ServiceName}-api"
+            StageName: prod
+            TracingEnabled: true
+            EndpointConfiguration:
+                Type: REGIONAL
             Auth:
-              Authorizer: NONE
+                DefaultAuthorizer: CognitoAuthorizer
+                AddDefaultAuthorizerToCorsPreflight: false
+                Authorizers:
+                    CognitoAuthorizer:
+                        UserPoolArn: !Ref UserPoolArn
+            MethodSettings:
+                - ResourcePath: "/*"
+                  HttpMethod: "*"
+                  MetricsEnabled: true
+                  ThrottlingRateLimit: 5
+                  ThrottlingBurstLimit: 10
+            GatewayResponses:
+                DEFAULT_4XX:
+                    ResponseParameters:
+                        Headers:
+                            Access-Control-Allow-Origin: "'*'"
+                            Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+                            Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
 
-  # Main Lambda handling all Pokemon routes
-  PokedexFunction:
-    Type: AWS::Serverless::Function
+                DEFAULT_5XX:
+                    ResponseParameters:
+                        Headers:
+                            Access-Control-Allow-Origin: "'*'"
+                            Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+                            Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
 
-    Properties:
-      CodeUri: ../dist
-      Handler: handlers/pokemon/index.pokemonMainHandler
+                UNAUTHORIZED:
+                    StatusCode: "401"
+                    ResponseTemplates:
+                        application/json: '{"message": $context.error.messageString}'
+                    ResponseParameters:
+                        Headers:
+                            Access-Control-Allow-Origin: "'*'"
+                            Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+                            Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
+            Cors:
+                AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+                AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
+                AllowOrigin: "'*'"
+                MaxAge: "'600'"
 
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref TableName
+    # Public Lambda used to check if API is alive
+    HealthCheckFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: ../dist
+            Handler: handlers/healthCheck.healthCheckHandler
 
-      # IAM permissions automatically generated for DynamoDB CRUD
-      Policies:
-        DynamoDBCrudPolicy:
-          TableName: !Ref TableName
+            Events:
+                HealthCheckApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref PokedexApi
+                        Path: /healthCheck
+                        Method: get
+                        Auth:
+                            Authorizer: NONE
 
-      Events:
-        # Public route: list all Pokemon
-        PokemonGetList:
-          Type: Api
-          Properties:
-            RestApiId: !Ref PokedexApi
-            Path: /users/me/pokemons
-            Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - openid
-                - email
+    # Main Lambda handling all Pokemon routes
+    PokedexFunction:
+        Type: AWS::Serverless::Function
 
-        # Private route: create a Pokemon
-        PokemonCreate:
-          Type: Api
-          Properties:
-            RestApiId: !Ref PokedexApi
-            Path: /users/me/pokemons
-            Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - openid
-                - email
+        Properties:
+            CodeUri: ../dist
+            Handler: handlers/pokemon/index.pokemonMainHandler
 
-        # Public route: get one Pokemon by ID
-        PokemonGetDetails:
-          Type: Api
-          Properties:
-            RestApiId: !Ref PokedexApi
-            Path: /users/me/pokemons/{id}
-            Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - openid
-                - email
+            Environment:
+                Variables:
+                    TABLE_NAME: !Ref TableName
 
-        # Private route: update one Pokemon
-        PokemonUpdate:
-          Type: Api
-          Properties:
-            RestApiId: !Ref PokedexApi
-            Path: /users/me/pokemons/{id}
-            Method: put
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - openid
-                - email
+            # IAM permissions automatically generated for DynamoDB CRUD
+            Policies:
+                DynamoDBCrudPolicy:
+                    TableName: !Ref TableName
 
-        # Private route: delete one Pokemon
-        PokemonDelete:
-          Type: Api
-          Properties:
-            RestApiId: !Ref PokedexApi
-            Path: /users/me/pokemons/{id}
-            Method: delete
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - openid
-                - email
+            Events:
+                # Public route: list all Pokemon
+                PokemonGetList:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref PokedexApi
+                        Path: /users/me/pokemons
+                        Method: get
+                        Auth:
+                            Authorizer: CognitoAuthorizer
+                            AuthorizationScopes:
+                                - openid
+                                - email
 
+                # Private route: create a Pokemon
+                PokemonCreate:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref PokedexApi
+                        Path: /users/me/pokemons
+                        Method: post
+                        Auth:
+                            Authorizer: CognitoAuthorizer
+                            AuthorizationScopes:
+                                - openid
+                                - email
 
-  # Admin lambda to manage users
-  AdminUserFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../dist
-      Handler: handlers/user/index.userMainHandler
+                # Public route: get one Pokemon by ID
+                PokemonGetDetails:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref PokedexApi
+                        Path: /users/me/pokemons/{id}
+                        Method: get
+                        Auth:
+                            Authorizer: CognitoAuthorizer
+                            AuthorizationScopes:
+                                - openid
+                                - email
 
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref TableName
-          USER_POOL_ID: !Ref UserPoolId
+                # Private route: update one Pokemon
+                PokemonUpdate:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref PokedexApi
+                        Path: /users/me/pokemons/{id}
+                        Method: put
+                        Auth:
+                            Authorizer: CognitoAuthorizer
+                            AuthorizationScopes:
+                                - openid
+                                - email
 
-      # IAM permissions automatically generated for DynamoDB CRUD
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref TableName
-        - Statement:
-          - Effect: Allow
-            Action:
-              - cognito-idp:AdminCreateUser
-              - cognito-idp:AdminAddUserToGroup
-              - cognito-idp:AdminGetUser
-            Resource: !Ref UserPoolArn
+                # Private route: delete one Pokemon
+                PokemonDelete:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref PokedexApi
+                        Path: /users/me/pokemons/{id}
+                        Method: delete
+                        Auth:
+                            Authorizer: CognitoAuthorizer
+                            AuthorizationScopes:
+                                - openid
+                                - email
 
-      Events:
-        UserCreate:
-          Type: Api
-          Properties:
-            RestApiId: !Ref PokedexApi
-            Path: /admin/users
-            Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - openid
-                - email
+    # Admin lambda to manage users
+    AdminUserFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: ../dist
+            Handler: handlers/user/index.userMainHandler
 
-        UserGetDetails:
-          Type: Api
-          Properties:
-            RestApiId: !Ref PokedexApi
-            Path: /users/me
-            Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - openid
-                - email
+            Environment:
+                Variables:
+                    TABLE_NAME: !Ref TableName
+                    USER_POOL_ID: !Ref UserPoolId
+
+            # IAM permissions automatically generated for DynamoDB CRUD
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref TableName
+                - Statement:
+                      - Effect: Allow
+                        Action:
+                            - cognito-idp:AdminCreateUser
+                            - cognito-idp:AdminAddUserToGroup
+                            - cognito-idp:AdminGetUser
+                        Resource: !Ref UserPoolArn
+
+            Events:
+                UserCreate:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref PokedexApi
+                        Path: /admin/users
+                        Method: post
+                        Auth:
+                            Authorizer: CognitoAuthorizer
+                            AuthorizationScopes:
+                                - openid
+                                - email
+
+                UserGetDetails:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref PokedexApi
+                        Path: /users/me
+                        Method: get
+                        Auth:
+                            Authorizer: CognitoAuthorizer
+                            AuthorizationScopes:
+                                - openid
+                                - email
 
 Outputs:
-  ApiId:
-    Description: API ID
-    Value: !Ref PokedexApi
-  ApiUrl:
-    Description: API Endpoint
-    Value: !Sub "https://${PokedexApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
+    ApiId:
+        Description: API ID
+        Value: !Ref PokedexApi
+    ApiUrl:
+        Description: API Endpoint
+        Value: !Sub "https://${PokedexApi}.execute-api.${AWS::Region}.amazonaws.com/prod"

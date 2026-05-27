@@ -7,7 +7,11 @@ import { validateSchema } from "../../validators/schemaValidator";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { PokemonResponseDto } from "../../dto/pokemon/pokemonResponse.dto";
 
-export const createPokemonHandler = async (service: PokemonService, userId: string, event: APIGatewayProxyEvent): Promise<PokemonResponseDto> => {
+export const createPokemonHandler = async (
+    service: PokemonService,
+    userId: string,
+    event: APIGatewayProxyEvent
+): Promise<PokemonResponseDto> => {
     if (!event.body) {
         throw badRequestError(ERROR_MESSAGES.MISSING_BODY);
     }

@@ -81,7 +81,7 @@ deploy: template-output.yml $(initStackName).outputs
 			Environment=$(env) \
 			StackSuffix=$(stackNameSuffix) \
 			LoggerLevel=$(logLevel)
-	STACK_NAME=$(stackName) AWS_REGION=$(region) node scripts/update-swagger-config.js
+	STACK_NAME=$(stackName) AWS_REGION=$(region) node scripts/update-swagger-config.cjs
 
 #deployBKP: template-output.yml $(initStackName).outputs
 #	sam deploy \

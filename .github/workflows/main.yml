@@ -1,13 +1,13 @@
 name: Main deployment
 
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 
 jobs:
-  deploy-test:
-    secrets: inherit
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: test
+    deploy-test:
+        secrets: inherit
+        uses: ./.github/workflows/deploy.yml
+        with:
+            environment: test

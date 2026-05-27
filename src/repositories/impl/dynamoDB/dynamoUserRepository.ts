@@ -11,7 +11,7 @@ import { UserProfileItem } from "../../types/userItem";
 const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
 
-export class DynamoUserRepository implements UserRepository{
+export class DynamoUserRepository implements UserRepository {
     private readonly tableName = process.env.TABLE_NAME!;
 
     async create(user: User): Promise<void> {
@@ -36,11 +36,10 @@ export class DynamoUserRepository implements UserRepository{
         }
 
         return toUserDetails(response.Item as UserProfileItem);
-
     }
 
     private async saveUser(user: User) {
-        const userProfileItem = toUserItems(user)
+        const userProfileItem = toUserItems(user);
         await docClient.send(
             new PutCommand({
                 TableName: this.tableName,
@@ -51,5 +50,4 @@ export class DynamoUserRepository implements UserRepository{
     private buildPk(userId: string): string {
         return `${USER_ITEM.PK_PREFIX}#${userId}`;
     }
-
 }

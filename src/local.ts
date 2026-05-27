@@ -74,8 +74,8 @@ async function main() {
         buildApiEvent({
             httpMethod: "GET",
             pathParameters: {
-                id: pokemonId
-            }
+                id: pokemonId,
+            },
         })
     );
     console.log("[getPokemonDetailsHandler] HTTP response:");
@@ -101,7 +101,7 @@ async function main() {
         buildApiEvent({
             httpMethod: "PUT",
             pathParameters: {
-                id: pokemonId
+                id: pokemonId,
             },
             body: JSON.stringify(pokemonUpdateFixture),
         })
@@ -118,7 +118,7 @@ async function main() {
         buildApiEvent({
             httpMethod: "DELETE",
             pathParameters: {
-                id: pokemonId
+                id: pokemonId,
             },
             body: JSON.stringify(pokemonUpdateFixture),
         })
@@ -177,14 +177,13 @@ async function main() {
                         sub: userBody.id,
                         email: userBody.email,
                         "cognito:groups": "",
-                    }
-                }
-            }
+                    },
+                },
+            },
         })
     );
     console.log("[getUserDetailsHandler] HTTP response:");
     console.log(response);
-
 
     // User create User
     console.log("************************");
@@ -199,8 +198,8 @@ async function main() {
                         sub: userBody.id,
                         email: userBody.email,
                         "cognito:groups": "",
-                    }
-                }
+                    },
+                },
             },
             body: JSON.stringify(userCreateFixture[0]),
         })

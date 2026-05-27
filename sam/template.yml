@@ -2,130 +2,129 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Description: >
-  Pokedex API — Exemple de template SAM simplifié.
-  Reproduit les patterns clés : nested stacks, outputs, tags standardisés, layer node_modules, ResourceGroup.
+    Pokedex API — Exemple de template SAM simplifié.
+    Reproduit les patterns clés : nested stacks, outputs, tags standardisés, layer node_modules, ResourceGroup.
 
 # -----------------------------------------------------------------------------
 # Parameters — alimentés par le Makefile via --parameter-overrides
 # -----------------------------------------------------------------------------
 Parameters:
-  ServiceName:
-    Type: String
-    Description: Pokedex API Service
+    ServiceName:
+        Type: String
+        Description: Pokedex API Service
 
-  Environment:
-    Type: String
-    AllowedValues: [dev, test, uat, prod]
+    Environment:
+        Type: String
+        AllowedValues: [dev, test, uat, prod]
 
-  StackSuffix:
-    Type: String
-    Description: Suffix of stack name (env or env-prId)
+    StackSuffix:
+        Type: String
+        Description: Suffix of stack name (env or env-prId)
 
-  LoggerLevel:
-    Type: String
-    Default: debug
-    AllowedValues: [error, warn, info, debug, trace]
+    LoggerLevel:
+        Type: String
+        Default: debug
+        AllowedValues: [error, warn, info, debug, trace]
 
-  CreateEventBus:
-    Type: String
-    Default: "false"
-    AllowedValues: ["true", "false"]
+    CreateEventBus:
+        Type: String
+        Default: "false"
+        AllowedValues: ["true", "false"]
 
-  EventBusName:
-    Type: String
-    Default: default
-    Description: Nom de l'event bus utilisé pour publier les events
+    EventBusName:
+        Type: String
+        Default: default
+        Description: Nom de l'event bus utilisé pour publier les events
 
 # -----------------------------------------------------------------------------
 # Conditions
 # -----------------------------------------------------------------------------
 Conditions:
-  IsCustomEventBus: !Equals [!Ref CreateEventBus, "true"]
+    IsCustomEventBus: !Equals [!Ref CreateEventBus, "true"]
 
 # -----------------------------------------------------------------------------
 # Resources — nested stacks (un fichier par responsabilité)
 # -----------------------------------------------------------------------------
 Resources:
+    # Layer partagé contenant les node_modules — évite de réuploader à chaque Lambda
+    NodeModulesLayer:
+        Type: AWS::Serverless::LayerVersion
+        DeletionPolicy: Delete
+        UpdateReplacePolicy: Delete
+        Properties:
+            CompatibleRuntimes: [nodejs20.x]
+            ContentUri: ../dist/layer
+            Description: Shared node_modules layer
+            LayerName: !Sub ${AWS::StackName}-NodeModulesLayer
 
-  # Layer partagé contenant les node_modules — évite de réuploader à chaque Lambda
-  NodeModulesLayer:
-    Type: AWS::Serverless::LayerVersion
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Delete
-    Properties:
-      CompatibleRuntimes: [nodejs20.x]
-      ContentUri: ../dist/layer
-      Description: Shared node_modules layer
-      LayerName: !Sub ${AWS::StackName}-NodeModulesLayer
+    # Event bus dédié — créé uniquement si CreateEventBus=true (utile pour les tests isolés)
+    EventBus:
+        Type: AWS::Events::EventBus
+        Condition: IsCustomEventBus
+        Properties:
+            Name: !Ref EventBusName
 
-  # Event bus dédié — créé uniquement si CreateEventBus=true (utile pour les tests isolés)
-  EventBus:
-    Type: AWS::Events::EventBus
-    Condition: IsCustomEventBus
-    Properties:
-      Name: !Ref EventBusName
+    # Nested stack — table DynamoDB
+    DynamoApp:
+        Type: AWS::Serverless::Application
+        Properties:
+            Location: ./dynamo.yml
+            TimeoutInMinutes: 5
+            Parameters:
+                ServiceName: !Ref ServiceName
+                StackSuffix: !Ref StackSuffix
 
-  # Nested stack — table DynamoDB
-  DynamoApp:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: ./dynamo.yml
-      TimeoutInMinutes: 5
-      Parameters:
-        ServiceName: !Ref ServiceName
-        StackSuffix: !Ref StackSuffix
+    # Nested stack — API Gateway + Lambdas CRUD
+    ApiApp:
+        Type: AWS::Serverless::Application
+        Properties:
+            Location: ./api.yml
+            Parameters:
+                ServiceName: !Ref ServiceName
+                Layer: !Ref NodeModulesLayer
+                LoggerLevel: !Ref LoggerLevel
+                EventBusName: !If [IsCustomEventBus, !Ref EventBus, default]
+                UserPoolId: !GetAtt AuthApp.Outputs.UserPoolId
+                UserPoolArn: !GetAtt AuthApp.Outputs.UserPoolArn
+                TableName: !GetAtt DynamoApp.Outputs.TableName
 
-  # Nested stack — API Gateway + Lambdas CRUD
-  ApiApp:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: ./api.yml
-      Parameters:
-        ServiceName: !Ref ServiceName
-        Layer: !Ref NodeModulesLayer
-        LoggerLevel: !Ref LoggerLevel
-        EventBusName: !If [IsCustomEventBus, !Ref EventBus, default]
-        UserPoolId: !GetAtt AuthApp.Outputs.UserPoolId
-        UserPoolArn: !GetAtt AuthApp.Outputs.UserPoolArn
-        TableName: !GetAtt DynamoApp.Outputs.TableName
+    # Nested stack — Cognito User Pool + middleware d'auth
+    AuthApp:
+        Type: AWS::Serverless::Application
+        Properties:
+            Location: ./auth.yml
+            Parameters:
+                ServiceName: !Ref ServiceName
+                StackSuffix: !Ref StackSuffix
 
-  # Nested stack — Cognito User Pool + middleware d'auth
-  AuthApp:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: ./auth.yml
-      Parameters:
-        ServiceName: !Ref ServiceName
-        StackSuffix: !Ref StackSuffix
+    # Nested stack — Lambdas asynchrones (consumer SQS, publishers EventBridge)
+    #  AsyncApp:
+    #    Type: AWS::Serverless::Application
+    #    DeletionPolicy: Delete
+    #    UpdateReplacePolicy: Delete
+    #    Properties:
+    #      Location: ./async.yml
+    #      Parameters:
+    #        ServiceName: !Ref ServiceName
+    #        Layer: !Ref NodeModulesLayer
+    #        LoggerLevel: !Ref LoggerLevel
+    #        TableName: !GetAtt DynamoApp.Outputs.TableName
+    #        EventBusName: !If [IsCustomEventBus, !Ref EventBus, default]
 
-  # Nested stack — Lambdas asynchrones (consumer SQS, publishers EventBridge)
-#  AsyncApp:
-#    Type: AWS::Serverless::Application
-#    DeletionPolicy: Delete
-#    UpdateReplacePolicy: Delete
-#    Properties:
-#      Location: ./async.yml
-#      Parameters:
-#        ServiceName: !Ref ServiceName
-#        Layer: !Ref NodeModulesLayer
-#        LoggerLevel: !Ref LoggerLevel
-#        TableName: !GetAtt DynamoApp.Outputs.TableName
-#        EventBusName: !If [IsCustomEventBus, !Ref EventBus, default]
-
-  # ResourceGroup — regroupe toutes les ressources du service via tag,
-  # facilite la supervision et le nettoyage
-  ResourceGroup:
-    Type: AWS::ResourceGroups::Group
-    Properties:
-      Name: !Sub ${AWS::StackName}-resource-group
-      Description: !Sub ${AWS::StackName} Resource Group
-      ResourceQuery:
-        Type: TAG_FILTERS_1_0
-        Query:
-          ResourceTypeFilters: [AWS::AllSupported]
-          TagFilters:
-            - Key: novatraqr:cloudformation:stack-name
-              Values: [!Ref AWS::StackName]
+    # ResourceGroup — regroupe toutes les ressources du service via tag,
+    # facilite la supervision et le nettoyage
+    ResourceGroup:
+        Type: AWS::ResourceGroups::Group
+        Properties:
+            Name: !Sub ${AWS::StackName}-resource-group
+            Description: !Sub ${AWS::StackName} Resource Group
+            ResourceQuery:
+                Type: TAG_FILTERS_1_0
+                Query:
+                    ResourceTypeFilters: [AWS::AllSupported]
+                    TagFilters:
+                        - Key: novatraqr:cloudformation:stack-name
+                          Values: [!Ref AWS::StackName]
 
 # -----------------------------------------------------------------------------
 # Outputs — exportés au format "OutputKey<TAB>OutputValue" dans le .outputs
@@ -133,40 +132,40 @@ Resources:
 # via `grep -w 'Key' pokedex-<env>.outputs | cut -f2` dans leur Makefile.
 # -----------------------------------------------------------------------------
 Outputs:
-  ApiUrl:
-    Description: URL publique de l'API Gateway
-    Value: !GetAtt ApiApp.Outputs.ApiUrl
+    ApiUrl:
+        Description: URL publique de l'API Gateway
+        Value: !GetAtt ApiApp.Outputs.ApiUrl
 
-  TableName:
-    Description: Nom de la table DynamoDB
-    Value: !GetAtt DynamoApp.Outputs.TableName
+    TableName:
+        Description: Nom de la table DynamoDB
+        Value: !GetAtt DynamoApp.Outputs.TableName
 
-  TableArn:
-    Description: ARN de la table DynamoDB
-    Value: !GetAtt DynamoApp.Outputs.TableArn
+    TableArn:
+        Description: ARN de la table DynamoDB
+        Value: !GetAtt DynamoApp.Outputs.TableArn
 
-#  EventBusName:
-#    Description: Nom de l'event bus utilisé (par défaut ou custom)
-#    Value: !If [IsCustomEventBus, !Ref EventBus, default]
-#
-#  EventBusArn:
-#    Description: ARN de l'event bus utilisé
-#    Value: !If
-#      - IsCustomEventBus
-#      - !GetAtt EventBus.Arn
-#      - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+    #  EventBusName:
+    #    Description: Nom de l'event bus utilisé (par défaut ou custom)
+    #    Value: !If [IsCustomEventBus, !Ref EventBus, default]
+    #
+    #  EventBusArn:
+    #    Description: ARN de l'event bus utilisé
+    #    Value: !If
+    #      - IsCustomEventBus
+    #      - !GetAtt EventBus.Arn
+    #      - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
 
-  UserPoolId:
-    Description: Cognito User Pool ID
-    Value: !GetAtt AuthApp.Outputs.UserPoolId
+    UserPoolId:
+        Description: Cognito User Pool ID
+        Value: !GetAtt AuthApp.Outputs.UserPoolId
 
-  UserPoolClientId:
-    Description: Cognito User Pool Client ID
-    Value: !GetAtt AuthApp.Outputs.UserPoolClientId
+    UserPoolClientId:
+        Description: Cognito User Pool Client ID
+        Value: !GetAtt AuthApp.Outputs.UserPoolClientId
 
-  UserPoolArn:
-    Description: Cognito User Pool ARN (consommé par le service fight pour JWT auth)
-    Value: !GetAtt AuthApp.Outputs.UserPoolArn
+    UserPoolArn:
+        Description: Cognito User Pool ARN (consommé par le service fight pour JWT auth)
+        Value: !GetAtt AuthApp.Outputs.UserPoolArn
 
 #  EventDLQ:
 #    Description: URL de la DLQ des events

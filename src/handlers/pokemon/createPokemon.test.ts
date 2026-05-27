@@ -18,7 +18,7 @@ describe("handler - create pokemon", () => {
                     name: "Pikachu",
                     types: ["Electric"],
                     description:
-                    "Petit et jaune auux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
+                        "Petit et jaune auux joues rouges et à la queue en éclair, capable de lancer des décharges électriques",
                     region: "Kanto",
                     level: 100,
                     hp: 380,
@@ -47,14 +47,12 @@ describe("handler - create pokemon", () => {
 
         const metadataItem = db.find(
             (item): item is PokemonMetadataItem =>
-                item.entityType === "USER_POKEMON_METADATA" &&
-                item.SK.startsWith("POKEMON#METADATA#")
+                item.entityType === "USER_POKEMON_METADATA" && item.SK.startsWith("POKEMON#METADATA#")
         );
 
         const statsItem = db.find(
             (item): item is PokemonStatsItem =>
-                item.entityType === "USER_POKEMON_STATS" &&
-                item.SK.startsWith("POKEMON#STATS#")
+                item.entityType === "USER_POKEMON_STATS" && item.SK.startsWith("POKEMON#STATS#")
         );
 
         expect(metadataItem).toBeDefined();

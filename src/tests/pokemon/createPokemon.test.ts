@@ -32,7 +32,7 @@ describe("createPokemon", () => {
                             "cognito:groups": "user",
                         },
                     },
-                }
+                },
             })
         );
 
@@ -47,14 +47,12 @@ describe("createPokemon", () => {
 
         const metadataItem = db.find(
             (item): item is PokemonMetadataItem =>
-                item.entityType === "USER_POKEMON_METADATA" &&
-                item.SK.startsWith("POKEMON#METADATA#")
+                item.entityType === "USER_POKEMON_METADATA" && item.SK.startsWith("POKEMON#METADATA#")
         );
 
         const statsItem = db.find(
             (item): item is PokemonStatsItem =>
-                item.entityType === "USER_POKEMON_STATS" &&
-                item.SK.startsWith("POKEMON#STATS#")
+                item.entityType === "USER_POKEMON_STATS" && item.SK.startsWith("POKEMON#STATS#")
         );
 
         expect(metadataItem).toBeDefined();

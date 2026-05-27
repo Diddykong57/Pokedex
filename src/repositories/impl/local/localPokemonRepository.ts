@@ -21,14 +21,12 @@ export class LocalPokemonRepository implements PokemonRepository {
     async getPokemonList(userId: string): Promise<PokemonListItem[]> {
         const pk = `${USER_ITEM.PK_PREFIX}#${userId}`;
         const pokemonList = fakePokemonDb.filter(
-            item =>
-                item.PK === pk &&
-                item.SK.startsWith(`${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}`)
+            item => item.PK === pk && item.SK.startsWith(`${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}`)
         ) as PokemonMetadataItem[];
         return pokemonList.map(item => toPokemonFromMetadataItem(item));
     }
 
-    async getPokemonDetails(userId:string, pokemonId:string): Promise<Pokemon> {
+    async getPokemonDetails(userId: string, pokemonId: string): Promise<Pokemon> {
         const pk = `${USER_ITEM.PK_PREFIX}#${userId}`;
         const skMetadata = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.METADATA.SK}#${pokemonId}`;
         const skStats = `${POKEMON_ITEM.NAME}#${POKEMON_ITEM.STATS.SK}#${pokemonId}`;
@@ -75,9 +73,7 @@ export class LocalPokemonRepository implements PokemonRepository {
     }
 
     private async getMetadata(pk: string, sk: string): Promise<PokemonMetadataItem> {
-        const metadata = fakePokemonDb.find(
-            (item): item is PokemonMetadataItem => item.PK === pk && item.SK === sk
-        );
+        const metadata = fakePokemonDb.find((item): item is PokemonMetadataItem => item.PK === pk && item.SK === sk);
 
         if (!metadata) {
             throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);
@@ -87,9 +83,7 @@ export class LocalPokemonRepository implements PokemonRepository {
     }
 
     private async getStats(pk: string, skStats: string): Promise<PokemonStatsItem> {
-        const stats = fakePokemonDb.find(
-            (item): item is PokemonStatsItem => item.PK === pk && item.SK === skStats
-        );
+        const stats = fakePokemonDb.find((item): item is PokemonStatsItem => item.PK === pk && item.SK === skStats);
 
         if (!stats) {
             throw notFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND);

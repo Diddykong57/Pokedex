@@ -7,7 +7,10 @@ import { toUserResponseDto } from "../../mappers/userMapper";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { UserResponseDto } from "../../dto/user/userResponse.dto";
 
-export const createUserHandler = async (service: UserService, event: APIGatewayProxyEvent): Promise<UserResponseDto> => {
+export const createUserHandler = async (
+    service: UserService,
+    event: APIGatewayProxyEvent
+): Promise<UserResponseDto> => {
     if (!event.body) {
         throw badRequestError(ERROR_MESSAGES.MISSING_BODY);
     }
