@@ -1,6 +1,7 @@
 import { getFakeDb } from "../../repositories/impl/local/localPokemonRepository";
 import { buildApiEvent } from "../fixtures/buildApiEvent";
 import { pokemonMainHandler } from "../../handlers/pokemon";
+import { PokemonMetadataItem, PokemonStatsItem } from "../../repositories/types/pokemonItem";
 
 describe("createPokemon", () => {
     beforeEach(() => {
@@ -44,8 +45,17 @@ describe("createPokemon", () => {
 
         expect(db.length).toBe(2);
 
-        const metadataItem = db.find(item => item.SK.startsWith("POKEMON#METADATA#"));
-        const statsItem = db.find(item => item.SK.startsWith("POKEMON#STATS#"));
+        const metadataItem = db.find(
+            (item): item is PokemonMetadataItem =>
+                item.entityType === "USER_POKEMON_METADATA" &&
+                item.SK.startsWith("POKEMON#METADATA#")
+        );
+
+        const statsItem = db.find(
+            (item): item is PokemonStatsItem =>
+                item.entityType === "USER_POKEMON_STATS" &&
+                item.SK.startsWith("POKEMON#STATS#")
+        );
 
         expect(metadataItem).toBeDefined();
         expect(statsItem).toBeDefined();

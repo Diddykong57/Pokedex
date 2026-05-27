@@ -43,6 +43,7 @@ export class LocalPokemonRepository implements PokemonRepository {
         const pk = `${USER_ITEM.PK_PREFIX}#${userId}`;
         const metadata = fakePokemonDb.find(
             (item): item is PokemonMetadataItem =>
+                item.entityType === POKEMON_ITEM.METADATA.ENTITY_TYPE &&
                 item.PK === pk &&
                 item.GSI1PK === POKEMON_ITEM.METADATA.GSI1PK &&
                 item.name === name

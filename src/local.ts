@@ -9,7 +9,6 @@ import { pokemonMainHandler } from "./handlers/pokemon";
 
 async function main() {
     let response: ApiResponse;
-    let body: object;
 
     // Create 1st pokemon
     console.log("**************************");
@@ -22,8 +21,8 @@ async function main() {
         })
     );
 
-    body = JSON.parse(response.body)
-    const pokemonId = body.id;
+    const pokemonBody = JSON.parse(response.body) as { id: string };
+    const pokemonId = pokemonBody.id;
 
     console.log("[createPokemonListHandler[0]] HTTP response:");
     console.log(response);
@@ -163,8 +162,7 @@ async function main() {
         })
     );
 
-    body = JSON.parse(response.body);
-
+    const userBody = JSON.parse(response.body) as { id: string; email: string };
 
     // Get one User
     console.log("********************");
@@ -176,8 +174,8 @@ async function main() {
             requestContext: {
                 authorizer: {
                     claims: {
-                        sub: body.id,
-                        email: body.email,
+                        sub: userBody.id,
+                        email: userBody.email,
                         "cognito:groups": "",
                     }
                 }
@@ -198,8 +196,8 @@ async function main() {
             requestContext: {
                 authorizer: {
                     claims: {
-                        sub: body.id,
-                        email: body.email,
+                        sub: userBody.id,
+                        email: userBody.email,
                         "cognito:groups": "",
                     }
                 }

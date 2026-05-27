@@ -1,9 +1,15 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
 
-export const buildApiEvent = (
-    overrides: Partial<APIGatewayProxyEvent> = {}
-): APIGatewayProxyEvent =>
-    ({
+type ApiEventOverrides = Omit<Partial<APIGatewayProxyEvent>, "requestContext"> & {
+    requestContext?: Partial<APIGatewayProxyEvent["requestContext"]> & {
+        authorizer?: {
+            claims?: Record<string, string>;
+        };
+    };
+};
+
+export const buildApiEvent = (overrides: ApiEventOverrides = {}): APIGatewayProxyEvent => {
+    const baseEvent: APIGatewayProxyEvent = {
         body: null,
         headers: {},
         multiValueHeaders: {},
@@ -35,5 +41,22 @@ export const buildApiEvent = (
             resourceId: "",
             resourcePath: "",
         },
+    };
+
+    return {
+        ...baseEvent,
         ...overrides,
-    }) as APIGatewayProxyEvent;
+        requestContext: {
+            ...baseEvent.requestContext,
+            ...overrides.requestContext,
+            authorizer: {
+                ...baseEvent.requestContext.authorizer,
+                ...overrides.requestContext?.authorizer,
+                claims: {
+                    ...baseEvent.requestContext.authorizer?.claims,
+                    ...overrides.requestContext?.authorizer?.claims,
+                },
+            },
+        },
+    } as APIGatewayProxyEvent;
+};
