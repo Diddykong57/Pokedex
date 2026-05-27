@@ -48,7 +48,8 @@ export class PokemonServiceImpl implements PokemonService {
     async updatePokemon(userId: string, pokemonId: string, data: UpdatePokemonRequestDto): Promise<PokemonResponseDto> {
         const existingPokemon = await this.getPokemonDetails(userId, pokemonId);
 
-        const { name, ...updatableFields } = data;
+        const updatableFields = { ...data };
+        delete updatableFields.name;
 
         const updatedPokemon: Pokemon = {
             ...existingPokemon,
