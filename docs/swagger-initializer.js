@@ -20,7 +20,7 @@ window.onload = function () {
     ui.initOAuth({
         clientId: "5e1sv0erm0h9nhhtvin5lh7cci",
         usePkceWithAuthorizationCodeGrant: true,
-        scopes: ["openid", "email", "pokedex-api/write"]
+        scopes: ["openid", "email"]
     });
 
     window.ui = ui;
