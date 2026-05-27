@@ -1,19 +1,22 @@
 import { UserService } from "../userService";
 import { UserRepository } from "../../repositories/userRepository";
-import { generateId } from "../../utils/idUtils";
 import { getCurrentDate } from "../../utils/dateUtils";
 import { CreateUserRequestDto } from "../../dto/user/createUserRequest.dto";
 import { User } from "../../models/user";
+import { IdentityRepository } from "../../repositories/identityRepository";
 
 export class UserServiceImpl implements UserService {
-    constructor(private readonly userRepository: UserRepository) {}
+    constructor(
+        private readonly userRepository: UserRepository,
+        private readonly identityRepository: IdentityRepository
+    ) {}
 
     async createUser(data: CreateUserRequestDto): Promise<User> {
-        const id = generateId();
+        const userId = await this.identityRepository.createUser(data.email);
         const now = getCurrentDate();
 
         const user: User = {
-            id: id,
+            id: userId,
             email: data.email,
             nickname: data.nickname,
             createdAt: now,

@@ -12,11 +12,16 @@ import { handleRequest } from "../utils/handleRequest";
 import { HTTP } from "../../global/constants/httpStatus";
 import { ApiResponse } from "../../global/types/api";
 import { badRequestError } from "../../utils/errorUtils";
+import { DynamoUserRepository } from "../../repositories/impl/dynamoDB/dynamoUserRepository";
+import { IdentityRepository } from "../../repositories/identityRepository";
+import { LocalIdentityRepository } from "../../repositories/impl/local/localIdentityRepository";
+import { CognitoIdentityRepository } from "../../repositories/impl/cognito/cognitoIdentityRepository";
 
-// const repository: UserRepository =
-//     process.env.APP_ENV === "aws" ? new DynamoUserRepository() : new LocalUserRepository();
-const repository: UserRepository = new LocalUserRepository();
-const service: UserService = new UserServiceImpl(repository);
+const userRepository: UserRepository =
+    process.env.APP_ENV === "aws" ? new DynamoUserRepository() : new LocalUserRepository();
+const identityRepository: IdentityRepository =
+    process.env.APP_ENV === "aws" ? new CognitoIdentityRepository() : new LocalIdentityRepository();
+const service: UserService = new UserServiceImpl(userRepository, identityRepository);
 
 export const userMainHandler = async (event: APIGatewayProxyEvent): Promise<ApiResponse> => {
 
