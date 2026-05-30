@@ -1,23 +1,28 @@
 # Pokedex API
 
-API REST de gestion d’un catalogue de Pokémon.
+API REST serverless permettant de gérer des utilisateurs et leur collection personnelle de Pokémon.
 
-Projet backend réalisé dans le cadre d’un exercice technique pour **Novatraqr**.
+Projet backend réalisé dans le cadre d’un exercice technique pour Novatraqr.
 
 ---
 
 # Fonctionnalités
 
-- Créer un Pokémon
-- Modifier un Pokémon
-- Supprimer un Pokémon
-- Récupérer un Pokémon par id
-- Lister tous les Pokémon
+## Utilisateurs
 
-**Accès :**
+- Créer un utilisateur via une route admin
+- Récupérer les informations de l’utilisateur connecté
+- Authentification via Amazon Cognito
+- Gestion du rôle admin via le groupe Cognito admin
 
-- `GET` publics
-- `POST / PUT / DELETE` protégés par authentification
+## Pokémon
+
+- Créer un Pokémon pour l’utilisateur connecté
+- Modifier un Pokémon de l’utilisateur connecté
+- Supprimer un Pokémon de l’utilisateur connecté
+- Récupérer le détail d’un Pokémon par id
+- Lister les Pokémon de l’utilisateur connecté
+- Les Pokémon sont rattachés au sub Cognito de l’utilisateur authentifié
 
 ---
 
@@ -27,21 +32,108 @@ Projet backend réalisé dans le cadre d’un exercice technique pour **Novatraq
 
 - Node.js
 - TypeScript
+- Jest
+- Joi
+- ESLint
+- Prettier
 
 ## AWS
 
 - API Gateway
 - Lambda
 - DynamoDB
-- Cognito
-- AWS SAM
-- CloudWatch
+- Cognito User Pool
+- Cognito Hosted UI
 - IAM
+- CloudWatch
+- AWS SAM
 
-## Outils
+## Documentation
 
-- Swagger / OpenAPI
-- Jest
+- Swagger UI
+- OpenAPI 3
+- Documentation découpée en plusieurs fichiers YAML
+
+---
+
+# Liens
+
+GitHub : https://github.com/Diddykong57/Pokedex.git
+
+API : https://9f1ws5ee1g.execute-api.eu-west-3.amazonaws.com/prod
+
+Documentation : https://diddykong57.github.io/Pokedex/
+
+---
+
+# Endpoints
+
+## HealthCheck
+
+- GET /healthCheck
+
+    Permet de vérifier que l’API est disponible.
+
+---
+
+## User
+
+- GET /users/me
+
+    Récupère les informations de l’utilisateur connecté.
+
+  (Auth requise : JWT Cognito.)
+
+
+- POST /admin/users
+
+    Crée un utilisateur.
+
+  (Auth requise : JWT Cognito + groupe admin.)
+
+---
+
+## Pokémon
+
+- GET /users/me/pokemons
+
+    Liste les Pokémon de l’utilisateur connecté.
+
+
+- POST /users/me/pokemons
+
+    Crée un Pokémon pour l’utilisateur connecté.
+
+
+- GET /users/me/pokemons/{id}
+
+    Récupère le détail d’un Pokémon de l’utilisateur connecté.
+
+
+- PUT /users/me/pokemons/{id}
+
+    Met à jour un Pokémon de l’utilisateur connecté.
+
+
+- DELETE /users/me/pokemons/{id}
+
+    Supprime un Pokémon de l’utilisateur connecté.
+
+---
+
+# Codes HTTP
+
+| Code | Description |
+| ---- | ----------- |
+| 200  | Succès |
+| 201  | Création réussie |
+| 204  | Suppression réussie |
+| 400  | Requête invalide |
+| 401  | Non authentifié |
+| 403  | Accès interdit |
+| 404  | Ressource introuvable |
+| 409  | Ressource déjà existante |
+| 500  | Erreur serveur |
 
 ---
 
@@ -49,118 +141,92 @@ Projet backend réalisé dans le cadre d’un exercice technique pour **Novatraq
 
 ## API Gateway
 
-- **pokedex-api**
+Expose les routes REST de l’application.
+
+Routes principales :
+
+- /healthCheck
+- /users/me
+- /admin/users
+- /users/me/pokemons
+- /users/me/pokemons/{id}
 
 ## Lambdas
 
-- **pokedex-healthcheck** - disponibilité de l’API
-- **pokedex-api** - Microservice pokemon
+- HealthCheckFunction : vérification de disponibilité
+- PokedexFunction : gestion des routes Pokémon
+- AdminUserFunction : gestion des routes utilisateur
 
 ## DynamoDB
 
-- **pokedex-dynamo**
+Stockage des utilisateurs et des Pokémon.
+
+Les Pokémon sont stockés par utilisateur avec une clé de partition basée sur l’id Cognito :
+
+USER#{userId}
+
+## Cognito
+
+- Authentification des utilisateurs
+- Hosted UI pour Swagger
+- Groupe admin pour les routes d’administration
 
 ---
 
-# Liens
+# Documentation Swagger
 
-**GitHub** : https://github.com/Diddykong57/Pokedex.git  
-**API** : https://36ymd9qykj.execute-api.eu-north-1.amazonaws.com/prod  
-**Documentation** : https://diddykong57.github.io/Pokedex/
+La documentation est disponible dans le dossier docs.
 
----
-
-# Endpoints
-
-## Publics
-
-```http
-GET /healthCheck
-GET /pokemon
-GET /pokemon/{id}
-```
-
-## Protégés
-
-```http
-POST /pokemon
-PUT /pokemon/{id}
-DELETE /pokemon/{id}
-```
-
-## Exemple d’architecture des routes
-
-- `/healthCheck` → Lambda **pokedex-healthcheck**
-- `/pokemon/*` → Lambda **pokedex-api**
+Lancer la commande : **npm run swagger**
 
 ---
 
-# Authentification
+# Structure du projet
 
-Les routes protégées utilisent Amazon Cognito.
-Connexion possible via Swagger (**Authorize**).
-
----
-
-# Codes HTTP
-
-| Code | Description           |
-| ---- | --------------------- |
-| 200  | Succès                |
-| 201  | Création réussie      |
-| 204  | Suppression réussie   |
-| 400  | Requête invalide      |
-| 401  | Non autorisé          |
-| 404  | Introuvable           |
-| 409  | Pokémon déjà existant |
-| 500  | Erreur serveur        |
-
----
-
-# Structure
-
-```text
-docs/                   : documentation Swagger
-src/
- ├── dto/               : objets de réponse / requête
- ├── global/            : constantes / types globaux
- ├── handlers/          : points d’entrée Lambda
- ├── mappers/           : transformations de données
- ├── models/            : modèles métier
- ├── repositories/      : accès données
- ├── services/          : logique métier
- ├── tests/             : tests unitaires
- ├── utils/             : helpers techniques
- ├── validators/        : validation des entrées
-```
+- src/
+- dto/               : objets de requête / réponse
+- global/            : constantes et types globaux
+- handlers/          : points d’entrée Lambda
+- mappers/           : transformations de données
+- models/            : modèles métier
+- repositories/      : accès aux données
+- services/          : logique métier
+- tests/             : fixtures et tests
+- utils/             : helpers techniques
+- validators/        : validation des entrées
 
 ---
 
 # Lancement local
 
-```bash
-npm install
-npm run dev
-npm test
-```
+Installer les dépendances : npm install
+
+Lancer le script local : npm run dev
+
+Lancer les tests : npm test
+
+Compiler le projet : npm run build
+
+Lancer Prettier + ESLint fix : npm run prettylint
 
 ---
 
 # Déploiement AWS
 
-```bash
-npm run deploy
-```
+Le déploiement est piloté par le Makefile.
 
----
+Déployer en environnement dev : make all env=dev
 
-# Bonus
+Déployer uniquement la stack déjà packagée : make deploy env=dev
 
-- Authentification Cognito
-- Déploiement AWS
-- Infrastructure as Code (SAM)
-- Documentation Swagger
-- Tests unitaires
+Supprimer la stack : make clean-stack env=dev
+
+# Notes
+
+- Les routes Pokémon ne sont plus publiques : elles dépendent de l’utilisateur connecté.
+- Un utilisateur créé directement via Cognito Hosted UI peut exister dans Cognito sans encore exister dans DynamoDB.
+- La route /admin/users permet de créer un utilisateur applicatif, mais nécessite un utilisateur Cognito appartenant au groupe admin.
+- GET /users/me/pokemons retourne [] si l’utilisateur n’a aucun Pokémon.
 
 ---
 
