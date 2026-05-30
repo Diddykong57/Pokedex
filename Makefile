@@ -117,7 +117,7 @@ clean:
 debug:
 	aws cloudformation describe-stack-events \
 	  --region $(region) \
-	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-AuthApp-1VNHC390TMFSF/4788eb70-5531-11f1-ae42-0ac5d11bcf4d
+	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-AuthApp-P7YRZF5AJ8X1/c71fc1f0-5c12-11f1-a3e9-0e19fe0b6943
 
 
 test: clean build package

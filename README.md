@@ -4,6 +4,8 @@ API REST serverless permettant de gérer des utilisateurs et leur collection per
 
 Projet backend réalisé dans le cadre d’un exercice technique pour Novatraqr.
 
+**Tester** l'API à cette URL : https://diddykong57.github.io/Pokedex/
+
 ---
 
 # Fonctionnalités

@@ -1,3 +1,3 @@
 window.POKEDEX_SWAGGER_CONFIG = {
-    cognitoClientId: "1amrq9qr48fnrasiqeo29h8c30",
+    cognitoClientId: "13h5oou2ec6uvj1v8gqbbvegp"
 };
