@@ -2,6 +2,7 @@ import { getFakeDb } from "../../repositories/impl/local/localPokemonRepository"
 import { pokemonMainHandler } from "./index";
 import { buildApiEvent } from "../../tests/fixtures/buildApiEvent";
 import { PokemonMetadataItem, PokemonStatsItem } from "../../repositories/types/pokemonItem";
+import {describe, expect} from '@jest/globals';
 
 describe("handler - create pokemon", () => {
     beforeEach(() => {

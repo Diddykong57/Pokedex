@@ -34,7 +34,7 @@ Parameters:
     EventBusName:
         Type: String
         Default: default
-        Description: Nom de l'event bus utilisé pour publier les events
+        Description: Nom de l'event bus utilise pour publier les events
 
 # -----------------------------------------------------------------------------
 # Conditions
@@ -145,16 +145,16 @@ Outputs:
         Description: ARN de la table DynamoDB
         Value: !GetAtt DynamoApp.Outputs.TableArn
 
-    #  EventBusName:
-    #    Description: Nom de l'event bus utilisé (par défaut ou custom)
-    #    Value: !If [IsCustomEventBus, !Ref EventBus, default]
-    #
-    #  EventBusArn:
-    #    Description: ARN de l'event bus utilisé
-    #    Value: !If
-    #      - IsCustomEventBus
-    #      - !GetAtt EventBus.Arn
-    #      - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+    EventBusName:
+        Description: Nom de l'event bus utilise (par defaut ou custom)
+        Value: !If [IsCustomEventBus, !Ref EventBus, default]
+
+    EventBusArn:
+        Description: ARN de l'event bus utilise
+        Value: !If
+          - IsCustomEventBus
+          - !GetAtt EventBus.Arn
+          - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
 
     UserPoolId:
         Description: Cognito User Pool ID
@@ -165,7 +165,7 @@ Outputs:
         Value: !GetAtt AuthApp.Outputs.UserPoolClientId
 
     UserPoolArn:
-        Description: Cognito User Pool ARN (consommé par le service fight pour JWT auth)
+        Description: Cognito User Pool ARN (consomme par le service fight pour JWT auth)
         Value: !GetAtt AuthApp.Outputs.UserPoolArn
 
 #  EventDLQ:

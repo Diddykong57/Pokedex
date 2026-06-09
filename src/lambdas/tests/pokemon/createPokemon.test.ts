@@ -2,6 +2,8 @@ import { getFakeDb } from "../../repositories/impl/local/localPokemonRepository"
 import { buildApiEvent } from "../fixtures/buildApiEvent";
 import { pokemonMainHandler } from "../../handlers/pokemon";
 import { PokemonMetadataItem, PokemonStatsItem } from "../../repositories/types/pokemonItem";
+import {describe, expect} from '@jest/globals';
+import "@aws-sdk/signature-v4-crt";
 
 describe("createPokemon", () => {
     beforeEach(() => {

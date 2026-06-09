@@ -6,6 +6,7 @@ import { createPokemonSchema } from "../../validators/pokemonSchema";
 import { validateSchema } from "../../validators/schemaValidator";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { PokemonResponseDto } from "../../dto/pokemon/pokemonResponse.dto";
+import { publisher } from "../../../events/rewards";
 
 export const createPokemonHandler = async (
     service: PokemonService,
@@ -20,5 +21,8 @@ export const createPokemonHandler = async (
     const validatedPayload = validateSchema(createPokemonSchema, payload);
 
     const pokemon = await service.createPokemon(userId, validatedPayload);
+    if (process.env.APP_ENV !== "test") {
+        await publisher();
+    }
     return toPokemonResponseDto(pokemon);
 };

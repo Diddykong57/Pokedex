@@ -4,6 +4,7 @@ import { getFakeDb, LocalPokemonRepository } from "../../repositories/impl/local
 import { PokemonServiceImpl } from "../../services/impl/pokemonServiceImpl";
 import { pokemonCreateFixture } from "../fixtures/pokemon";
 import { buildApiEvent } from "../fixtures/buildApiEvent";
+import {describe, expect} from '@jest/globals';
 
 describe("getPokemonList", () => {
     const userId = "user-001";

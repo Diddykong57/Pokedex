@@ -31,7 +31,7 @@ apiUrl          = $(shell grep -w 'ApiUrl'    $(stackName).outputs | cut -f2)
 # Décommenter et adapter dans le repo fight :
 #
 # pokedexStackName     ?= pokedex-$(env)
-pokedexEventBusName  ?= $(shell grep -w 'EventBusName' $(pokedexStackName).outputs | cut -f2)
+#pokedexEventBusName  ?= $(shell grep -w 'EventBusName' $(pokedexStackName).outputs | cut -f2)
 # pokedexUserPoolArn   ?= $(shell grep -w 'UserPoolArn'  $(pokedexStackName).outputs | cut -f2)
 # pokedexTableName     ?= $(shell grep -w 'TableName'    $(pokedexStackName).outputs | cut -f2)
 #
@@ -40,7 +40,7 @@ pokedexEventBusName  ?= $(shell grep -w 'EventBusName' $(pokedexStackName).outpu
 # -----------------------------------------------------------------------------
 
 createEventBus ?= true
-eventBusName   ?= default
+eventBusName   ?= pokedexBus
 
 include mk/plumbing.mk
 
@@ -80,7 +80,9 @@ deploy: template-output.yml $(initStackName).outputs
 			ServiceName=$(pkg-name) \
 			Environment=$(env) \
 			StackSuffix=$(stackNameSuffix) \
-			LoggerLevel=$(logLevel)
+			LoggerLevel=$(logLevel) \
+			CreateEventBus=$(createEventBus) \
+			EventBusName=$(eventBusName)
 	STACK_NAME=$(stackName) AWS_REGION=$(region) node scripts/update-swagger-config.cjs
 
 #deployBKP: template-output.yml $(initStackName).outputs

@@ -1,2 +1,109 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Layer:
+    Type: String
+    Default: ""
+  QueueTimeout:
+    Type: Number
+    Default: 30
+  LoggerLevel:
+    Description: "the logger lever used to filter output, can be on of error,warning,info,trace"
+    Type: String
+    Default: info
+  EventBusName:
+    Description: "the event bus used to put message and read messages. used to test the domain without interferences with others"
+    Type: String
+    Default: default
+  FifoQueuePrefix:
+    Description: "the prefix to add to the fifo queues, used to bypass a bug in sam"
+    Type: String
+  QueueReceiveCount:
+    Description: "the number of time a message will be sent before going to DLQ"
+    Type: Number
+    Default: 5
+  BatchSize:
+    Type: Number
+    MinValue: 1
+    MaxValue: 10
+    Default: 10
+
+Globals:
+  Function:
+    Runtime: nodejs24.x
+    MemorySize: 1024
+    Timeout: 25 # Default Visibility Timeout for SQS is 30 seconds. TODO: Consider creating custom queue.
+    Layers: !If [IsLayerEmpty, [], [!Ref Layer]] # Set default layer for all lambdas
+    # If is required here to pass a list of layers, or an empty string (not an empty list)
+    Environment:
+      Variables:
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+        LOGGER_LEVEL: !Ref LoggerLevel
+        NODE_OPTIONS: "--enable-source-maps"
+        EVENT_BUS_NAME: !Ref EventBusName
+    Tracing: Active
+
+Conditions:
+  IsLayerEmpty: !Equals [!Ref Layer, ""]
+
+Resources:
+  PokemonAddedToPokedexQueue:
+    Type: AWS::SQS::Queue
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      ContentBasedDeduplication: true
+      FifoQueue: true
+      MessageRetentionPeriod: 1209600
+      QueueName: !Sub ${FifoQueuePrefix}-PokemonAddedToPokedexQueue.fifo
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt PokemonAddedToPokedexDLQ.Arn
+        maxReceiveCount: 2
+      SqsManagedSseEnabled: true
+      VisibilityTimeout: 30
+
+  PokemonAddedToPokedexDLQ:
+    Type: AWS::SQS::Queue
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      ContentBasedDeduplication: true
+      FifoQueue: true
+      MessageRetentionPeriod: 1209600
+      QueueName: !Sub ${FifoQueuePrefix}-PokemonAddedToPokedexDLQ.fifo
+      SqsManagedSseEnabled: true
+
+  PokemonAddedToPokedexRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref EventBusName
+      EventPattern:
+        source:
+          - fr.novatraqr.my-service.my-module
+        detail-type:
+          - my-state
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt PokemonAddedToPokedexQueue.Arn
+          SqsParameters:
+            MessageGroupId: "PokemonAddedToPokedex"
+          Id: "TargetFunctionV1"
+
+  PokemonAddedToPokedexQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref PokemonAddedToPokedexQueue
+      PolicyDocument:
+        Statement:
+          - Action:
+              - "SQS:SendMessage"
+            Effect: "Allow"
+            Resource: !GetAtt PokemonAddedToPokedexQueue.Arn
+            Principal:
+              Service:
+                - "events.amazonaws.com"
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt PokemonAddedToPokedexRule.Arn
