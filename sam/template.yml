@@ -97,19 +97,20 @@ Resources:
                 ServiceName: !Ref ServiceName
                 StackSuffix: !Ref StackSuffix
 
-    # Nested stack — Lambdas asynchrones (consumer SQS, publishers EventBridge)
-    #  AsyncApp:
-    #    Type: AWS::Serverless::Application
-    #    DeletionPolicy: Delete
-    #    UpdateReplacePolicy: Delete
-    #    Properties:
-    #      Location: ./async.yml
-    #      Parameters:
-    #        ServiceName: !Ref ServiceName
-    #        Layer: !Ref NodeModulesLayer
-    #        LoggerLevel: !Ref LoggerLevel
-    #        TableName: !GetAtt DynamoApp.Outputs.TableName
-    #        EventBusName: !If [IsCustomEventBus, !Ref EventBus, default]
+#     Nested stack — Lambdas asynchrones (consumer SQS, publishers EventBridge)
+    AsyncApp:
+        Type: AWS::Serverless::Application
+        DeletionPolicy: Delete
+        UpdateReplacePolicy: Delete
+        Properties:
+          Location: ./async.yml
+          Parameters:
+#            ServiceName: !Ref ServiceName
+            Layer: !Ref NodeModulesLayer
+            LoggerLevel: !Ref LoggerLevel
+#            TableName: !GetAtt DynamoApp.Outputs.TableName
+            EventBusName: !If [IsCustomEventBus, !Ref EventBus, default]
+            FifoQueuePrefix: !Ref AWS::StackName
 
     # ResourceGroup — regroupe toutes les ressources du service via tag,
     # facilite la supervision et le nettoyage

@@ -31,7 +31,7 @@ apiUrl          = $(shell grep -w 'ApiUrl'    $(stackName).outputs | cut -f2)
 # Décommenter et adapter dans le repo fight :
 #
 # pokedexStackName     ?= pokedex-$(env)
-# pokedexEventBusName  ?= $(shell grep -w 'EventBusName' $(pokedexStackName).outputs | cut -f2)
+pokedexEventBusName  ?= $(shell grep -w 'EventBusName' $(pokedexStackName).outputs | cut -f2)
 # pokedexUserPoolArn   ?= $(shell grep -w 'UserPoolArn'  $(pokedexStackName).outputs | cut -f2)
 # pokedexTableName     ?= $(shell grep -w 'TableName'    $(pokedexStackName).outputs | cut -f2)
 #
@@ -39,7 +39,7 @@ apiUrl          = $(shell grep -w 'ApiUrl'    $(stackName).outputs | cut -f2)
 # deploy: $(pokedexStackName).outputs
 # -----------------------------------------------------------------------------
 
-createEventBus ?= false
+createEventBus ?= true
 eventBusName   ?= default
 
 include mk/plumbing.mk
@@ -117,7 +117,7 @@ clean:
 debug:
 	aws cloudformation describe-stack-events \
 	  --region $(region) \
-	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-AuthApp-P7YRZF5AJ8X1/c71fc1f0-5c12-11f1-a3e9-0e19fe0b6943
+	  --stack-name arn:aws:cloudformation:eu-west-3:630956767633:stack/pokedex-dev-AuthApp-U5Z2GNCO0G1K/a8049b80-634a-11f1-a3cf-0adc94b6a389
 
 
 test: clean build package

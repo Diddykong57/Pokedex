@@ -107,14 +107,14 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             CodeUri: ../dist
-            Handler: handlers/healthCheck.healthCheckHandler
+            Handler: lambdas/handlers/healthCheck.healthCheckHandler
 
             Events:
                 HealthCheckApi:
                     Type: Api
                     Properties:
                         RestApiId: !Ref PokedexApi
-                        Path: /healthCheck
+                        Path: /health-check
                         Method: get
                         Auth:
                             Authorizer: NONE
@@ -125,7 +125,7 @@ Resources:
 
         Properties:
             CodeUri: ../dist
-            Handler: handlers/pokemon/index.pokemonMainHandler
+            Handler: lambdas/handlers/pokemon/index.pokemonMainHandler
 
             Environment:
                 Variables:
@@ -133,8 +133,11 @@ Resources:
 
             # IAM permissions automatically generated for DynamoDB CRUD
             Policies:
-                DynamoDBCrudPolicy:
-                    TableName: !Ref TableName
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref TableName
+                - EventBridgePutEventsPolicy:
+                      EventBusName: !Ref EventBusName
+
 
             Events:
                 # Public route: list all Pokemon
@@ -142,72 +145,72 @@ Resources:
                     Type: Api
                     Properties:
                         RestApiId: !Ref PokedexApi
-                        Path: /users/me/pokemons
+                        Path: /pokemons
                         Method: get
                         Auth:
                             Authorizer: CognitoAuthorizer
-                            AuthorizationScopes:
-                                - openid
-                                - email
+#                            AuthorizationScopes:
+#                                - openid
+#                                - email
 
                 # Private route: create a Pokemon
                 PokemonCreate:
                     Type: Api
                     Properties:
                         RestApiId: !Ref PokedexApi
-                        Path: /users/me/pokemons
+                        Path: /pokemons
                         Method: post
                         Auth:
                             Authorizer: CognitoAuthorizer
-                            AuthorizationScopes:
-                                - openid
-                                - email
+#                            AuthorizationScopes:
+#                                - openid
+#                                - email
 
                 # Public route: get one Pokemon by ID
                 PokemonGetDetails:
                     Type: Api
                     Properties:
                         RestApiId: !Ref PokedexApi
-                        Path: /users/me/pokemons/{id}
+                        Path: /pokemons/{id}
                         Method: get
                         Auth:
                             Authorizer: CognitoAuthorizer
-                            AuthorizationScopes:
-                                - openid
-                                - email
+#                            AuthorizationScopes:
+#                                - openid
+#                                - email
 
                 # Private route: update one Pokemon
                 PokemonUpdate:
                     Type: Api
                     Properties:
                         RestApiId: !Ref PokedexApi
-                        Path: /users/me/pokemons/{id}
+                        Path: /pokemons/{id}
                         Method: put
                         Auth:
                             Authorizer: CognitoAuthorizer
-                            AuthorizationScopes:
-                                - openid
-                                - email
+#                            AuthorizationScopes:
+#                                - openid
+#                                - email
 
                 # Private route: delete one Pokemon
                 PokemonDelete:
                     Type: Api
                     Properties:
                         RestApiId: !Ref PokedexApi
-                        Path: /users/me/pokemons/{id}
+                        Path: /pokemons/{id}
                         Method: delete
                         Auth:
                             Authorizer: CognitoAuthorizer
-                            AuthorizationScopes:
-                                - openid
-                                - email
+#                            AuthorizationScopes:
+#                                - openid
+#                                - email
 
     # Admin lambda to manage users
     AdminUserFunction:
         Type: AWS::Serverless::Function
         Properties:
             CodeUri: ../dist
-            Handler: handlers/user/index.userMainHandler
+            Handler: lambdas/handlers/user/index.userMainHandler
 
             Environment:
                 Variables:
@@ -235,21 +238,21 @@ Resources:
                         Method: post
                         Auth:
                             Authorizer: CognitoAuthorizer
-                            AuthorizationScopes:
-                                - openid
-                                - email
+#                            AuthorizationScopes:
+#                                - openid
+#                                - email
 
                 UserGetDetails:
                     Type: Api
                     Properties:
                         RestApiId: !Ref PokedexApi
-                        Path: /users/me
+                        Path: /my-profile
                         Method: get
                         Auth:
                             Authorizer: CognitoAuthorizer
-                            AuthorizationScopes:
-                                - openid
-                                - email
+#                            AuthorizationScopes:
+#                                - openid
+#                                - email
 
 Outputs:
     ApiId:
