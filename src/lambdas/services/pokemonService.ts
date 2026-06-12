@@ -9,4 +9,5 @@ export interface PokemonService {
     getPokemonDetails(userId: string, pokemonId: string): Promise<PokemonResponseDto>;
     updatePokemon(userId: string, pokemonId: string, data: UpdatePokemonRequestDto): Promise<PokemonResponseDto>;
     deletePokemon(userId: string, id: string): Promise<void>;
+    getNumberOfPokemonAdded(userId: string): Promise<number>
 }

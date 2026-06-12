@@ -64,4 +64,8 @@ export class PokemonServiceImpl implements PokemonService {
     async deletePokemon(userId: string, pokemonId: string): Promise<void> {
         await this.pokemonRepository.deletePokemon(userId, pokemonId);
     }
+
+    async getNumberOfPokemonAdded(userId: string): Promise<number> {
+        return (await this.getPokemonList(userId)).length
+    }
 }

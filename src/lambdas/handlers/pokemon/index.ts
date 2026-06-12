@@ -14,6 +14,7 @@ import { handleRequest } from "../utils/handleRequest";
 import { getAuthContext } from "../utils/authMiddleware";
 import { badRequestError } from "../../utils/errorUtils";
 import { HTTP } from "../../global/constants/httpStatus";
+import { buildPokemonDetailEvent, publisher } from "../../../events/rewards";
 
 const repository: PokemonRepository =
     process.env.APP_ENV === "aws" ? new DynamoPokemonRepository() : new LocalPokemonRepository();
@@ -24,7 +25,12 @@ export const pokemonMainHandler = async (event: APIGatewayProxyEvent) => {
         case "POST":
             return handleRequest(async () => {
                 const auth = getAuthContext(event);
-                return createPokemonHandler(service, auth.userId, event);
+                const pokemonResponse = await createPokemonHandler(service, auth.userId, event);
+                const pokedexAddedDetailEvent = await buildPokemonDetailEvent(service, auth.userId)
+                if (process.env.APP_ENV !== "test") {
+                    await publisher(pokedexAddedDetailEvent);
+                }
+                return pokemonResponse;
             }, HTTP.CREATED);
         case "GET":
             return handleRequest(async () => {

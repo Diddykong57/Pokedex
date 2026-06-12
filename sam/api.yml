@@ -131,7 +131,7 @@ Resources:
                 Variables:
                     TABLE_NAME: !Ref TableName
 
-            # IAM permissions automatically generated for DynamoDB CRUD
+            # IAM permissions automatically generated for DynamoDB CRUD + Event bus
             Policies:
                 - DynamoDBCrudPolicy:
                       TableName: !Ref TableName
